@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"github.com/jinzhu/gorm"
@@ -6,7 +6,6 @@ import (
 
 type Roles struct {
 	gorm.Model
-	ID        int
 	Name      string `gorm:"unique_index"`
 	GuardName string `gorm:"unique_index"`
 }

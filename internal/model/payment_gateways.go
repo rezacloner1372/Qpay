@@ -1,13 +1,13 @@
 package model
 
 import (
-	"github.com/jinzhu/gorm"
 	"time"
+
+	"github.com/jinzhu/gorm"
 )
 
 type PaymentGateways struct {
 	gorm.Model
-	Id                int
 	Name              string    `gorm:"not null"`
 	UserId            string    `gorm:"not null"`
 	PersonalizedUrl   string    `gorm:"not null"`

@@ -2,7 +2,6 @@ package model
 
 import (
 	"errors"
-	"time"
 
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
@@ -10,16 +9,13 @@ import (
 
 type User struct {
 	gorm.Model
-	Id        int
-	Name      string    `gorm:"unique_index;not null"`
-	Family    string    `gorm:"unique_index;not null"`
-	Email     string    `gorm:"unique_index;not null"`
-	Cellphone string    `gorm:"unique_index;not null"`
-	Username  string    `gorm:"unique_index;not null"`
-	Password  string    `gorm:"not null"`
-	Status    string    `gorm:"not null"`
-	CreatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP()"`
-	UpdatedAt time.Time `gorm:"default:CURRENT_TIMESTAMP()"`
+	Name      string `gorm:"unique_index;not null"`
+	Family    string `gorm:"unique_index;not null"`
+	Email     string `gorm:"unique_index;not null"`
+	Cellphone string `gorm:"unique_index;not null"`
+	Username  string `gorm:"unique_index;not null"`
+	Password  string `gorm:"not null"`
+	Status    string `gorm:"not null"`
 	RoleId    int
 	Type      *string
 }
