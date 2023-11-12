@@ -7,7 +7,6 @@ import (
 
 type Transactions struct {
 	gorm.Model
-	Id              int
 	GatewayId       int       `gorm:"not null"`
 	Amount          string    `gorm:"not null"`
 	Status          string    `gorm:"not null"`

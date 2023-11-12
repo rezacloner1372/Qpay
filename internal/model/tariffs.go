@@ -8,7 +8,6 @@ import (
 
 type Tariffs struct {
 	gorm.Model
-	Id           int
 	Name         string    `gorm:"not null"`
 	Description  string    `gorm:"not null"`
 	Price        string    `gorm:"not null"`

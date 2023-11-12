@@ -1,49 +1,42 @@
 package db
 
 import (
+	"Qpay/internal/model"
 	"fmt"
 
-	"os"
-
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/xesina/golang-echo-realworld-example-app/model"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-func New() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "./realworld.db")
+func New() (*gorm.DB, error) {
+	dsn := "root:123456@tcp(mysql:3306)/qpay?charset=utf8mb4&parseTime=True"
+	db, err := gorm.Open("mysql", dsn)
 	if err != nil {
-		fmt.Println("storage err: ", err)
+		fmt.Println("Failed to connect database")
+		return nil, err
 	}
 	db.DB().SetMaxIdleConns(3)
 	db.LogMode(true)
-	return db
+	fmt.Println("Connected database")
+	return db, nil
 }
 
-func TestDB() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "./../realworld_test.db")
+func AutoMigrate(db *gorm.DB) error {
+	err := db.AutoMigrate(
+		&model.User{},
+		&model.Transactions{},
+		&model.Tariffs{},
+		&model.Roles{},
+		&model.RolesPermissions{},
+		&model.Permissions{},
+		&model.PaymentGateways{},
+	).Error
+
 	if err != nil {
-		fmt.Println("storage err: ", err)
-	}
-	db.DB().SetMaxIdleConns(3)
-	db.LogMode(false)
-	return db
-}
-
-func DropTestDB() error {
-	if err := os.Remove("./../realworld_test.db"); err != nil {
+		fmt.Println("Failed to migrate database")
 		return err
 	}
-	return nil
-}
 
-// TODO: err check
-func AutoMigrate(db *gorm.DB) {
-	db.AutoMigrate(
-		&model.User{},
-		&model.Follow{},
-		&model.Article{},
-		&model.Comment{},
-		&model.Tag{},
-	)
+	fmt.Println("Migrated database")
+	return nil
 }
