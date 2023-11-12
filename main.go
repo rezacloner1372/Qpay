@@ -1,28 +1,27 @@
 package main
 
 import (
-	"Qpay/internal/db"
-	"fmt"
+	"Qpay/cmd"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/spf13/cobra"
 )
 
-func init() {
-	// Initialize database connection
-	dbInstance, err := db.New()
-	if err != nil {
-		fmt.Println("Error connecting to the database:", err)
-		return
-	}
-
-	// Auto migrate tables
-	err = db.AutoMigrate(dbInstance)
-	if err != nil {
-		fmt.Println("Error during auto migration:", err)
-		return
-	}
-
-	defer dbInstance.Close()
-}
-
 func main() {
+	const description = "QPay application"
+	root := &cobra.Command{Short: description}
 
+	trap := make(chan os.Signal, 1)
+	signal.Notify(trap, syscall.SIGINT, syscall.SIGTERM)
+
+	root.AddCommand(
+		cmd.Migrate{}.Command(trap),
+	)
+
+	if err := root.Execute(); err != nil {
+		log.Fatalf("failed to execute root command: \n%v", err)
+	}
 }
