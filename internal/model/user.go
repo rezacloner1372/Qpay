@@ -16,7 +16,7 @@ type User struct {
 	Username  string `gorm:"unique_index;not null"`
 	Password  string `gorm:"not null"`
 	Status    string `gorm:"not null"`
-	RoleId    int
+	RoleId    uint   `gorm:"column:role_id"`
 	Type      *string
 }
 

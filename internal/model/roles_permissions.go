@@ -6,7 +6,7 @@ import (
 
 type RolesPermissions struct {
 	gorm.Model
-	roleId       int
-	permissionId int
+	roleId       uint   `gorm:"column:role_id"`
+	permissionId uint   `gorm:"column:permission_id"`
 	GuardName    string `gorm:"unique_index"`
 }
