@@ -18,6 +18,7 @@ func main() {
 	signal.Notify(trap, syscall.SIGINT, syscall.SIGTERM)
 
 	root.AddCommand(
+		cmd.Server{}.Command(trap),
 		cmd.Migrate{}.Command(trap),
 	)
 
