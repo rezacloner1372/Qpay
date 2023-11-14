@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"Qpay/internal/config"
+	"Qpay/internal/server"
 	"fmt"
 	"os"
 
-	"github.com/labstack/echo"
 	"github.com/spf13/cobra"
 )
 
@@ -25,11 +25,6 @@ func (s Server) Command(trap chan os.Signal) *cobra.Command {
 }
 
 func (s *Server) main(cfg *config.Config, trap chan os.Signal) {
-	e := echo.New()
-
 	address := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
-	fmt.Println(address)
-	if err := e.Start(address); err != nil {
-		e.Logger.Info("shutting down the server")
-	}
+	server.NewServer().Start(address)
 }
