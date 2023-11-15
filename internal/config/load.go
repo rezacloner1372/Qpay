@@ -2,12 +2,11 @@ package config
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/knadh/koanf"
-	"github.com/knadh/koanf/parsers/yaml"
-	"github.com/knadh/koanf/providers/env"
-	"github.com/knadh/koanf/providers/file"
+	"github.com/knadh/koanf/providers/structs"
 )
 
 const (
@@ -20,17 +19,22 @@ const (
 
 func Load(print bool) (*Config, error) {
 	k := koanf.New(delimeter)
-	// Load configuration from file
-	if err := k.Load(file.Provider("./config.yaml"), yaml.Parser()); err != nil {
-		return nil, fmt.Errorf("error loading configuration from file: %v", err)
+	// load default configuration from struct
+	if err := k.Load(structs.Provider(Default(), "koanf"), nil); err != nil {
+		log.Fatalf("error loading default: %s", err)
 	}
 
+	// Load configuration from file
+	// if err := k.Load(file.Provider("./config.yaml"), yaml.Parser()); err != nil {
+	// 	return nil, fmt.Errorf("error loading configuration from file: %v", err)
+	// }
+
 	// Load configuration from environment variables
-	if err := k.Load(env.Provider(tagName, ".", func(s string) string {
-		return s
-	}), nil); err != nil {
-		return nil, fmt.Errorf("error loading configuration from environment variables: %v", err)
-	}
+	// if err := k.Load(env.Provider(tagName, ".", func(s string) string {
+	// 	return s
+	// }), nil); err != nil {
+	// 	return nil, fmt.Errorf("error loading configuration from environment variables: %v", err)
+	// }
 
 	// Unmarshal the configuration into your Config struct
 	var config Config
