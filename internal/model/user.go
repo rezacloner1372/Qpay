@@ -18,6 +18,7 @@ type User struct {
 	Status    string `gorm:"not null"`
 	RoleId    int
 	Type      *string
+	Roles     Roles `gorm:"references:Role_id"`
 }
 
 func (u *User) HashPassword(plain string) (string, error) {
