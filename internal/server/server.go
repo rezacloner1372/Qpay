@@ -38,8 +38,13 @@ func (s *Server) Start(address string) error {
 func routing(e *echo.Echo) {
 	userRepo := repository.NewUserRepository()
 	userHandler := handler.NewUserHandler(userRepo)
-
 	e.POST("/auth/signup", userHandler.Signup())
 	e.POST("/auth/login", userHandler.Login())
 	e.GET("/auth/logout", userHandler.Logout())
+
+	paymentGatewaysRepo := repository.NewPaymentGatewaysRepository()
+	paymentHandler := handler.NewPaymentGatewaysHandler(paymentGatewaysRepo)
+	e.POST("/payment/gateway/new", paymentHandler.CreatePersonalGateway())
+	e.POST("/payment/gateway/business/new", paymentHandler.CreateBusinessGateway())
+
 }

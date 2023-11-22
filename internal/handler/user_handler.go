@@ -14,12 +14,12 @@ type UserHandler interface {
 }
 
 type userHandler struct {
-	userRepository repository.UserRepository
+	repository repository.UserRepository
 }
 
 func NewUserHandler(userRepository repository.UserRepository) userHandler {
 	return userHandler{
-		userRepository: userRepository,
+		repository: userRepository,
 	}
 }
 
