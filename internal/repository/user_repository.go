@@ -19,19 +19,34 @@ func NewUserRepository() UserRepository {
 }
 
 func (u *userRepository) Create(user model.User) (model.User, error) {
-	db := db.GetDatabaseConnection()
-	err := db.Create(&user).Error
-	return user, err
+	db, err := db.GetDatabaseConnection()
+
+	if err != nil {
+		return user, err
+	}
+
+	tx := db.Create(&user)
+	return user, tx.Error
 }
 
 func (u *userRepository) Update(user model.User) (model.User, error) {
-	db := db.GetDatabaseConnection()
-	err := db.Save(&user).Error
-	return user, err
+	db, err := db.GetDatabaseConnection()
+
+	if err != nil {
+		return user, err
+	}
+
+	tx := db.Create(&user)
+	return user, tx.Error
 }
 
 func (u *userRepository) Delete(id uint) error {
-	db := db.GetDatabaseConnection()
-	err := db.Delete(&model.User{}, id).Error
-	return err
+	db, err := db.GetDatabaseConnection()
+
+	if err != nil {
+		return err
+	}
+
+	tx := db.Delete(&model.User{}, id)
+	return tx.Error
 }

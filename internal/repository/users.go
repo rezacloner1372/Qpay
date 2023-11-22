@@ -2,9 +2,9 @@ package repository
 
 import (
 	"Qpay/internal/model"
-	"Qpay/pkg/utils"
 	"errors"
-	"gorm.io/gorm"
+
+	"github.com/jinzhu/gorm"
 )
 
 func GetUserByEmail(db *gorm.DB, email string) (*model.User, error) {
@@ -15,19 +15,4 @@ func GetUserByEmail(db *gorm.DB, email string) (*model.User, error) {
 	}
 
 	return &dbUser, nil
-}
-
-func RegisterUser(db *gorm.DB, email string, password string) (*model.User, error) {
-	hashedPassword, err := utils.HashPassword(password)
-	if err != nil {
-		return nil, err
-	}
-
-	user := model.User{Email: email, Password: hashedPassword}
-	result := db.Create(&user)
-	if err = result.Error; err != nil {
-		return nil, err
-	}
-
-	return &user, nil
 }
