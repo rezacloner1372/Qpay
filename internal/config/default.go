@@ -3,7 +3,7 @@ package config
 import (
 	"Qpay/internal/db"
 	"Qpay/internal/server"
-	"Qpay/pkg/utils"
+	"Qpay/pkg/jwt"
 )
 
 func Default() *Config {
@@ -19,7 +19,7 @@ func Default() *Config {
 			Password: "123456",
 			Database: "MYSQL",
 		},
-		JWT: &utils.Config{
+		JWT: &jwt.Config{
 			Secret:     "be8f3d8d-d01b-4d76-987f-42d219de9f6b",
 			Expiration: 24,
 		},
