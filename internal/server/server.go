@@ -1,7 +1,11 @@
 package server
 
 import (
-	"github.com/labstack/echo"
+	"Qpay/internal/handler"
+	"Qpay/internal/repository"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type Server struct {
@@ -15,8 +19,16 @@ func NewServer() *Server {
 }
 
 func (s *Server) Start(address string) error {
-	if err := s.E.Start(address); err != nil {
-		s.E.Logger.Fatal(err)
+	e := s.E
+
+	// Middleware
+	e.Use(middleware.Logger())  // Logger
+	e.Use(middleware.Recover()) // Recover
+
+	routing(s.E)
+
+	if err := e.Start(address); err != nil {
+		e.Logger.Fatal(err)
 		return err
 	}
 
@@ -24,4 +36,15 @@ func (s *Server) Start(address string) error {
 }
 
 func routing(e *echo.Echo) {
+	userRepo := repository.NewUserRepository()
+	userHandler := handler.NewUserHandler(userRepo)
+	e.POST("/auth/signup", userHandler.Signup())
+	e.POST("/auth/login", userHandler.Login())
+	e.GET("/auth/logout", userHandler.Logout())
+
+	paymentGatewaysRepo := repository.NewPaymentGatewaysRepository()
+	paymentHandler := handler.NewPaymentGatewaysHandler(paymentGatewaysRepo)
+	e.POST("/payment/gateway/new", paymentHandler.CreatePersonalGateway())
+	e.POST("/payment/gateway/business/new", paymentHandler.CreateBusinessGateway())
+
 }
