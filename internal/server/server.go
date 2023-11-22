@@ -1,6 +1,7 @@
 package server
 
 import (
+	"Qpay/internal/db"
 	"Qpay/internal/handler"
 	"Qpay/internal/repository"
 
@@ -25,6 +26,7 @@ func (s *Server) Start(address string) error {
 	e.Use(middleware.Logger())  // Logger
 	e.Use(middleware.Recover()) // Recover
 
+	db.CreateDBConnection()
 	routing(s.E)
 
 	if err := e.Start(address); err != nil {
