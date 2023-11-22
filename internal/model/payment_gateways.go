@@ -14,4 +14,6 @@ type PaymentGateways struct {
 	Tariff            int       `grom:"not null"`
 	Status            int       `grom:"not null"`
 	RegisterationDate time.Time `gorm:"default:CURRENT_TIMESTAMP()"`
+	User              User      `gorm:"references:id"`
+	Tariffs           Tariffs   `gorm:"references:id"`
 }
