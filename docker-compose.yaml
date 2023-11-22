@@ -9,8 +9,10 @@ services:
       MYSQL_DATABASE: qpay
       MYSQL_USER: qpay
       MYSQL_PASSWORD: qpay123456
+      MYSQL_HOST: qpay-mysql
     ports:
       - "3306:3306"
+
 
   qpay-app:
     build:
@@ -21,3 +23,4 @@ services:
       - "8080:8080"
     depends_on:
       - mysql
+
