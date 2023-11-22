@@ -3,9 +3,11 @@ package config
 import (
 	"Qpay/internal/db"
 	"Qpay/internal/server"
+	"Qpay/pkg/logger"
 )
 
 type Config struct {
-	Server *server.Config `json:"server"`
+	Server *server.Config `koanf:"server"`
 	DB     *db.Config     `koanf:"database"`
+	Logger *logger.Config `koanf:"logger"`
 }

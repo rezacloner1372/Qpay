@@ -6,6 +6,9 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/knadh/koanf"
+	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/env"
+	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/providers/structs"
 )
 
@@ -25,16 +28,16 @@ func Load(print bool) (*Config, error) {
 	}
 
 	// Load configuration from file
-	// if err := k.Load(file.Provider("./config.yaml"), yaml.Parser()); err != nil {
-	// 	return nil, fmt.Errorf("error loading configuration from file: %v", err)
-	// }
+	if err := k.Load(file.Provider("./sample-config.yaml"), yaml.Parser()); err != nil {
+		return nil, fmt.Errorf("error loading configuration from file: %v", err)
+	}
 
 	// Load configuration from environment variables
-	// if err := k.Load(env.Provider(tagName, ".", func(s string) string {
-	// 	return s
-	// }), nil); err != nil {
-	// 	return nil, fmt.Errorf("error loading configuration from environment variables: %v", err)
-	// }
+	if err := k.Load(env.Provider(tagName, ".", func(s string) string {
+		return s
+	}), nil); err != nil {
+		return nil, fmt.Errorf("error loading configuration from environment variables: %v", err)
+	}
 
 	// Unmarshal the configuration into your Config struct
 	var config Config

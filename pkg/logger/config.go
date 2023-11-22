@@ -5,11 +5,3 @@ type Config struct {
 	Encoding    string `koanf:"encoding"`
 	Development bool   `koanf:"development"`
 }
-
-func DefaultConfig() *Config {
-	return &Config{
-		Development: true,
-		Encoding:    "json",
-		Level:       "info",
-	}
-}

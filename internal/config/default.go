@@ -3,6 +3,7 @@ package config
 import (
 	"Qpay/internal/db"
 	"Qpay/internal/server"
+	"Qpay/pkg/logger"
 )
 
 func Default() *Config {
@@ -17,6 +18,11 @@ func Default() *Config {
 			Username: "root",
 			Password: "123456",
 			Database: "MYSQL",
+		},
+		Logger: &logger.Config{
+			Development: true,
+			Encoding:    "json",
+			Level:       "info",
 		},
 	}
 }

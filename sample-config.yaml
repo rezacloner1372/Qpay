@@ -1,9 +1,12 @@
 database:
   mysql_host: "localhost"
   mysql_port: 3306
-  mysql_username: "your_username"
-  mysql_password: "your_password"
-  mysql_database: "your_database"
+  mysql_username: "root"
+  mysql_password: "123456"
+  mysql_database: "qpay"
 jwt:
   secret: "your_secret"
   expiration_hours: 72
+server:
+  host: "localhost"
+  port: 8080

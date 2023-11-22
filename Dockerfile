@@ -19,8 +19,10 @@ FROM alpine:latest
 WORKDIR /app
 
 COPY --from=build /app/main .
+COPY sample-config.yaml .
+COPY /internal/db/migration /app/migration
 
 EXPOSE 8080
 
-CMD ["./main"]
+CMD ["./main", "migrate", "up"]
 #CMD echo "Container is running in debug mode" && tail -f /dev/null

@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    deleted_at TIMESTAMP,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    guard_name VARCHAR(255) UNIQUE NOT NULL
+);
+
+
+
+
