@@ -37,18 +37,22 @@ func CreateDBConnection() (*gorm.DB, error) {
 	return db, nil
 }
 
-func GetDatabaseConnection() *gorm.DB {
-	sqlDB := dbConn.DB()
+func GetDatabaseConnection() (*gorm.DB, error) {
+	if dbConn != nil {
+		sqlDB := dbConn.DB()
 
-	if sqlDB == nil {
-		fmt.Println("Failed to get database connection")
+		if sqlDB == nil {
+			return nil, fmt.Errorf("failed to get database connection")
+		}
+
+		if err := sqlDB.Ping(); err != nil {
+			return nil, err
+		}
+
+		return dbConn, nil
 	}
 
-	if err := sqlDB.Ping(); err != nil {
-		fmt.Println("Failed to ping database connection")
-	}
-
-	return dbConn
+	return nil, fmt.Errorf("failed to get database connection")
 }
 
 func CloseDBConnection(db *gorm.DB) {
