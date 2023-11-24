@@ -49,4 +49,11 @@ func routing(e *echo.Echo) {
 	e.POST("/payment/gateway/new", paymentHandler.CreatePersonalGateway())
 	e.POST("/payment/gateway/business/new", paymentHandler.CreateBusinessGateway())
 
+	tariffRepo := repository.NewTariffRepository()
+	tariffHandler := handler.NewTariffHandler(tariffRepo)
+	e.POST("/tariff/new", tariffHandler.Create())
+	e.PUT("/tariff/:id", tariffHandler.Update())
+	e.DELETE("/tariff/:id", tariffHandler.Delete())
+	e.GET("/tariff/all", tariffHandler.GetAll())
+	e.GET("/tariff/:id", tariffHandler.GetById())
 }
