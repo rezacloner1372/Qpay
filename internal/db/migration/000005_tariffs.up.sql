@@ -8,6 +8,6 @@ CREATE TABLE IF NOT EXISTS tariffs (
     price VARCHAR(255) NOT NULL,
     currency VARCHAR(255) NOT NULL,
     validity_days INT NOT NULL,
-    is_default INT NOT NULL,
+    isDefault INT NOT NULL DEFAULT 0,
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
 );
