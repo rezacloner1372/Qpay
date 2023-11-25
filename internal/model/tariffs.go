@@ -13,6 +13,6 @@ type Tariffs struct {
 	Price        string    `gorm:"not null"`
 	Currency     string    `gorm:"not null"`
 	ValidityDays int       `gorm:"not null"`
-	isDefault    int       `gorm:"not null"`
+	isDefault    int       `gorm:"default:0"`
 	CreationDate time.Time `gorm:"default:CURRENT_TIMESTAMP()"`
 }
