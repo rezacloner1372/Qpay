@@ -4,6 +4,11 @@ import (
 	"Qpay/internal/db"
 	"Qpay/internal/handler"
 	"Qpay/internal/repository"
+	"net/http"
+
+	customeMiddleware "Qpay/internal/middleware"
+
+	"github.com/go-playground/validator"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -11,6 +16,18 @@ import (
 
 type Server struct {
 	E *echo.Echo
+}
+
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+func (cv *CustomValidator) Validate(i interface{}) error {
+	if err := cv.validator.Struct(i); err != nil {
+		// Optionally, you could return the error to give each route more control over the status code
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return nil
 }
 
 func NewServer() *Server {
@@ -21,6 +38,7 @@ func NewServer() *Server {
 
 func (s *Server) Start(address string) error {
 	e := s.E
+	e.Validator = &CustomValidator{validator: validator.New()}
 
 	// Middleware
 	e.Use(middleware.Logger())  // Logger
@@ -42,7 +60,7 @@ func routing(e *echo.Echo) {
 	userHandler := handler.NewUserHandler(userRepo)
 	e.POST("/auth/signup", userHandler.Signup())
 	e.POST("/auth/login", userHandler.Login())
-	e.GET("/auth/logout", userHandler.Logout())
+	e.GET("/auth/logout", userHandler.Logout(), customeMiddleware.RequireAuth)
 
 	paymentGatewaysRepo := repository.NewPaymentGatewaysRepository()
 	paymentHandler := handler.NewPaymentGatewaysHandler(paymentGatewaysRepo)
@@ -51,9 +69,9 @@ func routing(e *echo.Echo) {
 
 	tariffRepo := repository.NewTariffRepository()
 	tariffHandler := handler.NewTariffHandler(tariffRepo)
-	e.POST("/tariff/new", tariffHandler.Create())
-	e.PUT("/tariff/:id", tariffHandler.Update())
-	e.DELETE("/tariff/:id", tariffHandler.Delete())
-	e.GET("/tariff/all", tariffHandler.GetAll())
-	e.GET("/tariff/:id", tariffHandler.GetById())
+	e.POST("/tariff/new", tariffHandler.Create(), customeMiddleware.RequireAuth)
+	e.PUT("/tariff/:id", tariffHandler.Update(), customeMiddleware.RequireAuth)
+	e.DELETE("/tariff/:id", tariffHandler.Delete(), customeMiddleware.RequireAuth)
+	e.GET("/tariff/all", tariffHandler.GetAll(), customeMiddleware.RequireAuth)
+	e.GET("/tariff/:id", tariffHandler.GetById(), customeMiddleware.RequireAuth)
 }
