@@ -9,16 +9,16 @@ import (
 
 type User struct {
 	gorm.Model
-	Name      string `gorm:"unique_index;not null"`
-	Family    string `gorm:"unique_index;not null"`
+	Name      string `gorm:"not null"`
+	Family    string `gorm:"not null"`
 	Email     string `gorm:"unique_index;not null"`
 	Cellphone string `gorm:"unique_index;not null"`
 	Username  string `gorm:"unique_index;not null"`
 	Password  string `gorm:"not null"`
-	Status    string `gorm:"not null"`
-	RoleId    int
+	Status    int    `gorm:"default:1"`
+	Role_id   *int
 	Type      *string
-	Roles     Roles `gorm:"references:Role_id"`
+	Roles     Roles `gorm:"foreignkey:Role_id"`
 }
 
 func (u *User) HashPassword(plain string) (string, error) {
