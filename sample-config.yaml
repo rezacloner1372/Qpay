@@ -5,7 +5,7 @@ database:
   mysql_password: "123456"
   mysql_database: "qpay"
 jwt:
-  secret: "your_secret"
+  secret: "af97879a-4039-448b-bca4-4228d7755635"
   expiration_hours: 72
 server:
   host: "localhost"
