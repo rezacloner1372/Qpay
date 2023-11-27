@@ -38,7 +38,7 @@ func (m *Migrate) main(cfg *config.Config, args []string, trap chan os.Signal) {
 		}).Fatal("Invalid arguments given")
 	}
 
-	db, err := db.CreateDBConnection()
+	db, err := db.CreateDBConnection(cfg.DB)
 	if err != nil {
 		logger.WithFields(logrus.Fields{
 			"error": err,

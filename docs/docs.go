@@ -25,74 +25,14 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/articles": {
-            "get": {
-                "description": "Get most recent articles globally. Use query parameters to filter results. Auth is optional",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "article"
-                ],
-                "summary": "Get recent articles globally",
-                "operationId": "get-articles",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Filter by tag",
-                        "name": "tag",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by author (username)",
-                        "name": "author",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Filter by favorites of a user (username)",
-                        "name": "favorited",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Limit number of articles returned (default is 20)",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Offset/skip number of articles (default is 0)",
-                        "name": "offset",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.articleListResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            },
+        "/auth/signup": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Create an article. Auth is require",
+                "description": "Register Users in Qpay",
                 "consumes": [
                     "application/json"
                 ],
@@ -100,1047 +40,72 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "article"
+                    "Authentication"
                 ],
-                "summary": "Create an article",
-                "operationId": "create-article",
+                "summary": "Register Users",
+                "operationId": "signup",
                 "parameters": [
                     {
-                        "description": "Article to create",
-                        "name": "article",
+                        "description": "user first name",
+                        "name": "name",
                         "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handler.articleCreateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/handler.singleArticleResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/articles/feed": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get most recent articles from users you follow. Use query parameters to limit. Auth is required",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "article"
-                ],
-                "summary": "Get recent articles from users you follow",
-                "operationId": "feed",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Limit number of articles returned (default is 20)",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Offset/skip number of articles (default is 0)",
-                        "name": "offset",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.articleListResponse"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/articles/{slug}": {
-            "get": {
-                "description": "Get an article. Auth not required",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "article"
-                ],
-                "summary": "Get an article",
-                "operationId": "get-article",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Slug of the article to get",
-                        "name": "slug",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.singleArticleResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Update an article. Auth is required",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "article"
-                ],
-                "summary": "Update an article",
-                "operationId": "update-article",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Slug of the article to update",
-                        "name": "slug",
-                        "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Article to update",
-                        "name": "article",
+                        "description": "user last name",
+                        "name": "family",
                         "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handler.articleUpdateRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.singleArticleResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete an article. Auth is required",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "article"
-                ],
-                "summary": "Delete an article",
-                "operationId": "delete-article",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Slug of the article to delete",
-                        "name": "slug",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/articles/{slug}/comments": {
-            "get": {
-                "description": "Get the comments for an article. Auth is optional",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "comment"
-                ],
-                "summary": "Get the comments for an article",
-                "operationId": "get-comments",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Slug of the article that you want to get comments for",
-                        "name": "slug",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.commentListResponse"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Create a comment for an article. Auth is required",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "comment"
-                ],
-                "summary": "Create a comment for an article",
-                "operationId": "add-comment",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Slug of the article that you want to create a comment for",
-                        "name": "slug",
-                        "in": "path",
                         "required": true
                     },
                     {
-                        "description": "Comment you want to create",
-                        "name": "comment",
+                        "description": "user email",
+                        "name": "email",
                         "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handler.createCommentRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/handler.singleCommentResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/articles/{slug}/comments/{id}": {
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Delete a comment for an article. Auth is required",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "comment"
-                ],
-                "summary": "Delete a comment for an article",
-                "operationId": "delete-comments",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Slug of the article that you want to delete a comment for",
-                        "name": "slug",
-                        "in": "path",
                         "required": true
                     },
                     {
-                        "type": "integer",
-                        "description": "ID of the comment you want to delete",
-                        "name": "id",
-                        "in": "path",
+                        "description": "user cellphone",
+                        "name": "cellphone",
+                        "in": "body",
                         "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
                     },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/articles/{slug}/favorite": {
-            "post": {
-                "security": [
                     {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Favorite an article. Auth is required",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "favorite"
-                ],
-                "summary": "Favorite an article",
-                "operationId": "favorite",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Slug of the article that you want to favorite",
-                        "name": "slug",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.singleArticleResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Unfavorite an article. Auth is required",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "favorite"
-                ],
-                "summary": "Unfavorite an article",
-                "operationId": "unfavorite",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Slug of the article that you want to unfavorite",
-                        "name": "slug",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.singleArticleResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/profiles/{username}": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get a profile of a user of the system. Auth is optional",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "profile"
-                ],
-                "summary": "Get a profile",
-                "operationId": "get-profile",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Username of the profile to get",
+                        "description": "prefered username",
                         "name": "username",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.userResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/profiles/{username}/follow": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Follow a user by username",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "follow"
-                ],
-                "summary": "Follow a user",
-                "operationId": "follow",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Username of the profile you want to follow",
-                        "name": "username",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.profileResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Unfollow a user by username",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "follow"
-                ],
-                "summary": "Unfollow a user",
-                "operationId": "unfollow",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Username of the profile you want to unfollow",
-                        "name": "username",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/handler.userResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/tags": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Get tags",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "tag"
-                ],
-                "summary": "Get tags",
-                "operationId": "tags",
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/handler.tagListResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/user": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Gets the currently logged-in user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Get the current user",
-                "operationId": "current-user",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.userResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Update user information for current user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Update current user",
-                "operationId": "update-user",
-                "parameters": [
-                    {
-                        "description": "User details to update. At least **one** field is required.",
-                        "name": "user",
                         "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handler.userUpdateRequest"
-                        }
+                        "required": true
+                    },
+                    {
+                        "description": "strong password",
+                        "name": "password",
+                        "in": "body",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.userResponse"
-                        }
+                        "description": "Created"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
+                        "description": "Bad Request"
                     },
                     "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
+                        "description": "Unauthorized"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
+                        "description": "Internal Server Error"
                     }
                 }
             }
         },
-        "/users": {
+        "/auth/login": {
             "post": {
-                "description": "Register a new user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Register a new user",
-                "operationId": "sign-up",
-                "parameters": [
+                "security": [
                     {
-                        "description": "User info for registration",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handler.userRegisterRequest"
-                        }
+                        "ApiKeyAuth": []
                     }
                 ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/handler.userResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/users/login": {
-            "post": {
-                "description": "Login for existing user",
+                "description": "Login users in Qpay",
                 "consumes": [
                     "application/json"
                 ],
@@ -1148,406 +113,398 @@ var doc = `{
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "Authentication"
                 ],
-                "summary": "Login for existing user",
+                "summary": "Login Users",
                 "operationId": "login",
                 "parameters": [
                     {
-                        "description": "Credentials to use",
-                        "name": "user",
+                        "description": "user account username",
+                        "name": "username",
                         "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handler.userLoginRequest"
-                        }
+                        "required": true
+                    },
+                    {
+                        "description": "user account password",
+                        "name": "password",
+                        "in": "body",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/handler.userResponse"
-                        }
+                        "description": "OK"
                     },
                     "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
+                        "description": "Bad Request"
                     },
                     "401": {
-                        "description": "Unauthorized",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
-                    },
-                    "422": {
-                        "description": "Unprocessable Entity",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
+                        "description": "Unauthorized"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Error"
-                        }
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "get": {
+                "description": "Used to get users loged out",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout Users",
+                "operationId": "logout",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/payment/gateway/new": {
+            "post": {
+                "description": "Used By users to create new personal payment gateway.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payment Gateway"
+                ],
+                "summary": "Create Personal Payment Gateway",
+                "operationId": "personal-payment-gateway",
+                "parameters": [
+                    {
+
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/payment/gateway/business/new": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Used By Companies to create new business payment gateway.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payment Gateway"
+                ],
+                "summary": "Create Business Payment Gateway",
+                "operationId": "business-payment-gateway",
+                "parameters": [
+
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/tariff/new": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Define New Tariff for User Payment Gateways.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tariff"
+                ],
+                "summary": "Create Tariff",
+                "operationId": "create-tariff",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "prefered name for tariff",
+                        "name": "name",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "description for this tariff",
+                        "name": "description",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "tariff price",
+                        "name": "price",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "prefered currency for tariff",
+                        "name": "currency",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "validity days of tariff",
+                        "name": "validitydays",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "default value can be 0 or not",
+                        "name": "isdefault",
+                        "in": "body",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/tariff/:id": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get an specific tariff using its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tariff"
+                ],
+                "summary": "Get Tariff",
+                "operationId": "get-tariff",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "update prefered tariff values",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tariff"
+                ],
+                "summary": "Update Tariff",
+                "operationId": "update-tariff",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "prefered name for tariff",
+                        "name": "name",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "description for this tariff",
+                        "name": "description",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "tariff price",
+                        "name": "price",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "prefered currency for tariff",
+                        "name": "currency",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "validity days of tariff",
+                        "name": "validitydays",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "default value can be 0 or not",
+                        "name": "isdefault",
+                        "in": "body",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete prefered tariff",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tariff"
+                ],
+                "summary": "Delete Tariff",
+                "operationId": "delete-tariff",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+            }
+        },
+        "/tariff/all": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get list of all tariffs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Tariff"
+                ],
+                "summary": "Get All Tariffs",
+                "operationId": "get-all-tariffs",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
                     }
                 }
             }
         }
     },
     "definitions": {
-        "handler.articleCreateRequest": {
-            "type": "object",
-            "required": [
-                "body",
-                "description",
-                "title"
-            ],
-            "properties": {
-                "article": {
-                    "type": "object",
-                    "properties": {
-                        "body": {
-                            "type": "string"
-                        },
-                        "description": {
-                            "type": "string"
-                        },
-                        "tagList": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        "title": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "handler.articleListResponse": {
-            "type": "object",
-            "properties": {
-                "articles": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/handler.articleResponse"
-                    }
-                },
-                "articlesCount": {
-                    "type": "integer"
-                }
-            }
-        },
-        "handler.articleResponse": {
-            "type": "object",
-            "properties": {
-                "author": {
-                    "type": "object",
-                    "properties": {
-                        "bio": {
-                            "type": "string"
-                        },
-                        "following": {
-                            "type": "boolean"
-                        },
-                        "image": {
-                            "type": "string"
-                        },
-                        "username": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "body": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "favorited": {
-                    "type": "boolean"
-                },
-                "favoritesCount": {
-                    "type": "integer"
-                },
-                "slug": {
-                    "type": "string"
-                },
-                "tagList": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "title": {
-                    "type": "string"
-                },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "handler.articleUpdateRequest": {
-            "type": "object",
-            "properties": {
-                "article": {
-                    "type": "object",
-                    "properties": {
-                        "body": {
-                            "type": "string"
-                        },
-                        "description": {
-                            "type": "string"
-                        },
-                        "tagList": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        "title": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "handler.commentListResponse": {
-            "type": "object",
-            "properties": {
-                "comments": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/handler.commentResponse"
-                    }
-                }
-            }
-        },
-        "handler.commentResponse": {
-            "type": "object",
-            "properties": {
-                "author": {
-                    "type": "object",
-                    "properties": {
-                        "bio": {
-                            "type": "string"
-                        },
-                        "following": {
-                            "type": "boolean"
-                        },
-                        "image": {
-                            "type": "string"
-                        },
-                        "username": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "body": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "updatedAt": {
-                    "type": "string"
-                }
-            }
-        },
-        "handler.createCommentRequest": {
-            "type": "object",
-            "required": [
-                "body"
-            ],
-            "properties": {
-                "comment": {
-                    "type": "object",
-                    "properties": {
-                        "body": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "handler.profileResponse": {
-            "type": "object",
-            "properties": {
-                "profile": {
-                    "type": "object",
-                    "properties": {
-                        "bio": {
-                            "type": "string"
-                        },
-                        "following": {
-                            "type": "boolean"
-                        },
-                        "image": {
-                            "type": "string"
-                        },
-                        "username": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "handler.singleArticleResponse": {
-            "type": "object",
-            "properties": {
-                "article": {
-                    "type": "object",
-                    "$ref": "#/definitions/handler.articleResponse"
-                }
-            }
-        },
-        "handler.singleCommentResponse": {
-            "type": "object",
-            "properties": {
-                "comment": {
-                    "type": "object",
-                    "$ref": "#/definitions/handler.commentResponse"
-                }
-            }
-        },
-        "handler.tagListResponse": {
-            "type": "object",
-            "properties": {
-                "tags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "handler.userLoginRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
-            "properties": {
-                "user": {
-                    "type": "object",
-                    "properties": {
-                        "email": {
-                            "type": "string"
-                        },
-                        "password": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "handler.userRegisterRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "password",
-                "username"
-            ],
-            "properties": {
-                "user": {
-                    "type": "object",
-                    "properties": {
-                        "email": {
-                            "type": "string"
-                        },
-                        "password": {
-                            "type": "string"
-                        },
-                        "username": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "handler.userResponse": {
-            "type": "object",
-            "properties": {
-                "user": {
-                    "type": "object",
-                    "properties": {
-                        "bio": {
-                            "type": "string"
-                        },
-                        "email": {
-                            "type": "string"
-                        },
-                        "image": {
-                            "type": "string"
-                        },
-                        "token": {
-                            "type": "string"
-                        },
-                        "username": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "handler.userUpdateRequest": {
-            "type": "object",
-            "properties": {
-                "user": {
-                    "type": "object",
-                    "properties": {
-                        "bio": {
-                            "type": "string"
-                        },
-                        "email": {
-                            "type": "string"
-                        },
-                        "image": {
-                            "type": "string"
-                        },
-                        "password": {
-                            "type": "string"
-                        },
-                        "username": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "utils.Error": {
-            "type": "object",
-            "properties": {
-                "errors": {
-                    "type": "object",
-                    "additionalProperties": true
-                }
-            }
-        }
-    },
-    "securityDefinitions": {
-        "ApiKeyAuth": {
-            "type": "apiKey",
-            "name": "Authorization",
-            "in": "header"
-        }
     }
 }`
 
@@ -1563,11 +520,11 @@ type swaggerInfo struct {
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
 	Version:     "1.0",
-	Host:        "127.0.0.1:8585",
-	BasePath:    "/api",
+	Host:        "127.0.0.1:8080",
+	BasePath:    "/",
 	Schemes:     []string{"http", "https"},
-	Title:       "Conduit API",
-	Description: "Conduit API",
+	Title:       "QPay API",
+	Description: "QPay API",
 }
 
 type s struct{}

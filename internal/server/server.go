@@ -10,8 +10,11 @@ import (
 
 	"github.com/go-playground/validator"
 
+	_ "Qpay/docs"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 type Server struct {
@@ -36,7 +39,7 @@ func NewServer() *Server {
 	}
 }
 
-func (s *Server) Start(address string) error {
+func (s *Server) Start(address string, cfg *db.Config) error {
 	e := s.E
 	e.Validator = &CustomValidator{validator: validator.New()}
 
@@ -44,13 +47,14 @@ func (s *Server) Start(address string) error {
 	e.Use(middleware.Logger())  // Logger
 	e.Use(middleware.Recover()) // Recover
 
-	db.CreateDBConnection()
+	db.CreateDBConnection(cfg)
 	routing(s.E)
 
-	if err := e.Start(address); err != nil {
-		e.Logger.Fatal(err)
-		return err
-	}
+	go func() {
+		if err := e.Start(address); err != nil {
+			e.Logger.Fatal(err)
+		}
+	}()
 
 	return nil
 }
@@ -58,6 +62,7 @@ func (s *Server) Start(address string) error {
 func routing(e *echo.Echo) {
 	userRepo := repository.NewUserRepository()
 	userHandler := handler.NewUserHandler(userRepo)
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 	e.POST("/auth/signup", userHandler.Signup())
 	e.POST("/auth/login", userHandler.Login())
 	e.GET("/auth/logout", userHandler.Logout(), customeMiddleware.RequireAuth)
