@@ -12,12 +12,12 @@ var (
 	dbConn *gorm.DB
 )
 
-func CreateDBConnection() (*gorm.DB, error) {
+func CreateDBConnection(cfg *Config) (*gorm.DB, error) {
 	if dbConn != nil {
 		return dbConn, nil // Reuse existing connection
 	}
 
-	dsn := "root:123456@tcp(localhost:3306)/qpay?charset=utf8mb4&parseTime=True"
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True", cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.Database)
 	// Open a Gorm DB connection
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {

@@ -39,7 +39,7 @@ func NewServer() *Server {
 	}
 }
 
-func (s *Server) Start(address string) error {
+func (s *Server) Start(address string, cfg *db.Config) error {
 	e := s.E
 	e.Validator = &CustomValidator{validator: validator.New()}
 
@@ -47,7 +47,7 @@ func (s *Server) Start(address string) error {
 	e.Use(middleware.Logger())  // Logger
 	e.Use(middleware.Recover()) // Recover
 
-	db.CreateDBConnection()
+	db.CreateDBConnection(cfg)
 	routing(s.E)
 
 	go func() {

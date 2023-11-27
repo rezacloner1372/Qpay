@@ -27,7 +27,7 @@ func (s Server) Command(trap chan os.Signal) *cobra.Command {
 
 func (s *Server) main(cfg *config.Config, trap chan os.Signal) {
 	address := fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port)
-	server.NewServer().Start(address)
+	server.NewServer().Start(address, cfg.DB)
 
 	// Keep this at the bottom of the main function
 	// Wait for a signal
