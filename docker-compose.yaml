@@ -1,26 +1,46 @@
 version: '3'
 
 services:
-  mysql:
+  qpay-mysql:
     image: mysql:latest
     container_name: qpay-mysql
+    hostname: qpay-mysql
     environment:
       MYSQL_ROOT_PASSWORD: 123456
       MYSQL_DATABASE: qpay
       MYSQL_USER: qpay
       MYSQL_PASSWORD: qpay123456
       MYSQL_HOST: qpay-mysql
+      MYSQL_TCP_PORT: 3306
     ports:
       - "3306:3306"
+    volumes:
+      - qpay-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-P", "3306", "-uqpay", "-pqpay123456"]
+      interval: 30s
+      retries: 5
+      timeout: 10s
 
 
   qpay-app:
     build:
       context: .
+    restart: always
     image: qpay-app:latest
+    hostname: qpay-app
     container_name: qpay-app
+    command: >
+      /bin/sh -c "
+        ./wait-for-it.sh -t 40 qpay-mysql:3306 && ./Qpay server
+      "
     ports:
       - "8080:8080"
-    depends_on:
-      - mysql
+    depends_on:    
+      qpay-mysql:
+          condition: service_healthy
+    links:
+      - qpay-mysql
 
+volumes:
+  qpay-mysql-data:

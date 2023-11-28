@@ -1,3 +1,4 @@
+# Stage 1: Build the application
 FROM golang:1.21 AS build
 
 ENV GO111MODULE=on \
@@ -6,23 +7,27 @@ ENV GO111MODULE=on \
 
 WORKDIR /app
 
-COPY go.sum go.mod ./
+COPY go.mod go.sum ./
 
 RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o /Qpay .
 
+# Stage 2: Create the final lightweight image
 FROM alpine:latest
+RUN apk --no-cache add ca-certificates bash
 
 WORKDIR /app
 
-COPY --from=build /app/main .
+COPY --from=build /Qpay .
 COPY sample-config.yaml .
-COPY /internal/db/migration /app/migration
+COPY internal/db/migration /app/internal/db/migration
+COPY wait-for-it.sh /app/wait-for-it.sh 
+RUN chmod +x /app/wait-for-it.sh
 
 EXPOSE 8080
 
-CMD ["./main", "migrate", "up"]
-#CMD echo "Container is running in debug mode" && tail -f /dev/null
+# ENTRYPOINT [ "/bin/bash", "-c" ]
+# CMD ["./Qpay"]

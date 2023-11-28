@@ -8,5 +8,5 @@ jwt:
   secret: "af97879a-4039-448b-bca4-4228d7755635"
   expiration_hours: 72
 server:
-  host: "localhost"
+  host: "qpay-app"
   port: 8080
