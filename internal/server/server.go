@@ -68,9 +68,12 @@ func routing(e *echo.Echo) {
 	e.GET("/auth/logout", userHandler.Logout(), customeMiddleware.RequireAuth)
 
 	paymentGatewaysRepo := repository.NewPaymentGatewaysRepository()
-	paymentHandler := handler.NewPaymentGatewaysHandler(paymentGatewaysRepo)
-	e.POST("/payment/gateway/new", paymentHandler.CreatePersonalGateway())
-	e.POST("/payment/gateway/business/new", paymentHandler.CreateBusinessGateway())
+	paymentGatewayHandler := handler.NewPaymentGatewaysHandler(paymentGatewaysRepo)
+	e.POST("/payment-gateways/new", paymentGatewayHandler.Create(), customeMiddleware.RequireAuth)
+	e.PUT("/payment-gateways/:id", paymentGatewayHandler.Update(), customeMiddleware.RequireAuth)
+	e.DELETE("/payment-gateways/:id", paymentGatewayHandler.Delete(), customeMiddleware.RequireAuth)
+	e.GET("/payment-gateways/all", paymentGatewayHandler.GetAll(), customeMiddleware.RequireAuth)
+	e.GET("/payment-gateways/:id", paymentGatewayHandler.GetById(), customeMiddleware.RequireAuth)
 
 	tariffRepo := repository.NewTariffRepository()
 	tariffHandler := handler.NewTariffHandler(tariffRepo)
