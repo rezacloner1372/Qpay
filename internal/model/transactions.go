@@ -1,17 +1,19 @@
 package model
 
 import (
-	"github.com/jinzhu/gorm"
 	"time"
 )
 
 type Transactions struct {
-	gorm.Model
-	GatewayId       int             `gorm:"not null"`
-	Amount          string          `gorm:"not null"`
+	ID              uint      `gorm:"primaryKey;autoIncrement"`
+	CreatedAt       time.Time `gorm:"index"`
+	UpdatedAt       time.Time
+	DeletedAt       *time.Time      `gorm:"index"`
+	GatewayID       uint            `gorm:"not null"`
+	Gateway         PaymentGateways `gorm:"foreignKey:GatewayID"`
+	Amount          int             `gorm:"not null"`
 	Status          string          `gorm:"not null"`
 	TransactionTime time.Time       `gorm:"not null"`
-	UserId          int             `gorm:"not null"`
-	User            User            `gorm:"references:id"`
-	PaymentGateways PaymentGateways `gorm:"references:id"`
+	UserID          uint            `gorm:"not null"`
+	User            User            `gorm:"foreignKey:UserID"`
 }

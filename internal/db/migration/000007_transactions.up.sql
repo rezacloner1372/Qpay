@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP NULL,
     gateway_id INT NOT NULL,
-    amount VARCHAR(255) NOT NULL,
+    amount INT NOT NULL,
     status VARCHAR(255) NOT NULL,
     transaction_time TIMESTAMP NOT NULL,
     user_id INT NOT NULL,
