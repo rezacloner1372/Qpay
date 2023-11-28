@@ -5,9 +5,9 @@ CREATE TABLE IF NOT EXISTS tariffs (
     deleted_at TIMESTAMP NULL,
     name VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    price VARCHAR(255) NOT NULL,
+    price INT NOT NULL,
     currency VARCHAR(255) NOT NULL,
     validity_days INT NOT NULL,
-    isDefault INT NOT NULL DEFAULT 0,
+    is_default INT NOT NULL DEFAULT 0,
     creation_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
 );
