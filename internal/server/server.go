@@ -94,6 +94,6 @@ func routing(e *echo.Echo) {
 	paymentHandler := handler.NewPaymentHandler(transactionRepo, paymentGatewaysRepo)
 	e.POST("/payment/request", paymentHandler.PaymentRequest())
 	e.POST("/payment/verify", paymentHandler.PaymentVerification())
-	// e.GET("/payment/callback", paymentHandler.PaymentCallback())
+	e.GET("/payment/callback", paymentHandler.PaymentCallback())
 	e.GET("/payment/:Authority", paymentHandler.PaymentAction())
 }

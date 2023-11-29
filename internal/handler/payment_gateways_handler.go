@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -29,11 +30,31 @@ func NewPaymentGatewaysHandler(paymentGatewaysRepository repository.PaymentGatew
 
 func (s *paymentGatewaysHandler) Create() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		// Parse request body to extract paymentGateways information
-		var newPaymentGateways model.PaymentGateways
-		if err := c.Bind(&newPaymentGateways); err != nil {
+		var request struct {
+			Title     string `json:"title" form:"title" validate:"required"`
+			UserID    uint   `json:"user_id" form:"user_id" validate:"required"`
+			IsDefault int    `json:"is_default" form:"is_default" validate:"required"`
+			TariffID  *uint  `json:"tariff_id" form:"tariff_id"`
+		}
+
+		if err := c.Bind(&request); err != nil {
 			return c.String(http.StatusBadRequest, "Invalid request body")
 		}
+
+		// Validate request body
+		if err := c.Validate(request); err != nil {
+			return c.String(http.StatusBadRequest, err.Error())
+		}
+
+		// Create new paymentGateways
+		newPaymentGateways := model.PaymentGateways{
+			Title:      request.Title,
+			UserID:     request.UserID,
+			IsDefault:  request.IsDefault,
+			TariffID:   request.TariffID,
+			MerchantID: uuid.New().String(),
+		}
+
 		// Create paymentGateways using paymentGatewaysRepository
 		createdPaymentGateways, err := s.repository.Create(newPaymentGateways)
 		if err != nil {

@@ -64,7 +64,7 @@ func (u *paymentGatewaysRepository) GetAll() ([]model.PaymentGateways, error) {
 		return paymentGateways, err
 	}
 
-	tx := db.Find(&paymentGateways)
+	tx := db.Preload("User").Preload("Tariff").Find(&paymentGateways)
 	return paymentGateways, tx.Error
 }
 
@@ -77,7 +77,7 @@ func (u *paymentGatewaysRepository) GetById(id uint) (model.PaymentGateways, err
 		return paymentGateway, err
 	}
 
-	tx := db.Find(&paymentGateway, id)
+	tx := db.Preload("User").Preload("Tariff").Find(&paymentGateway, id)
 	return paymentGateway, tx.Error
 }
 
@@ -90,6 +90,6 @@ func (u *paymentGatewaysRepository) GetByMerchantId(merchantId string) (model.Pa
 		return paymentGateway, err
 	}
 
-	tx := db.Find(&paymentGateway, "merchant_id = ?", merchantId)
+	tx := db.Preload("User").Preload("Tariff").Find(&paymentGateway, "merchant_id = ?", merchantId)
 	return paymentGateway, tx.Error
 }

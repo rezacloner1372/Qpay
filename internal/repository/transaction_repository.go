@@ -16,6 +16,7 @@ type TransactionRepository interface {
 	GetAll() ([]model.Transactions, error)
 	GetById(id uint) (model.Transactions, error)
 	GetByAuthority(authority string) (model.Transactions, error)
+	GetByBankAuthority(bankAuthority string) (model.Transactions, error)
 }
 
 type transactionRepository struct {
@@ -63,7 +64,7 @@ func (t *transactionRepository) GetAll() ([]model.Transactions, error) {
 	if err != nil {
 		return transactions, err
 	}
-	tx := db.Find(&transactions)
+	tx := db.Preload("User").Preload("Gateway").Find(&transactions)
 	return transactions, tx.Error
 }
 
@@ -75,7 +76,7 @@ func (t *transactionRepository) GetById(id uint) (model.Transactions, error) {
 	if err != nil {
 		return transaction, err
 	}
-	tx := db.First(&transaction, id)
+	tx := db.Preload("User").Preload("Gateway").First(&transaction, id)
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return transaction, nil
 	}
@@ -90,7 +91,22 @@ func (t *transactionRepository) GetByAuthority(authority string) (model.Transact
 	if err != nil {
 		return transaction, err
 	}
-	tx := db.First(&transaction, "authority = ?", authority)
+	tx := db.Preload("User").Preload("Gateway").First(&transaction, "authority = ?", authority)
+	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+		return transaction, nil
+	}
+	return transaction, tx.Error
+}
+
+func (t *transactionRepository) GetByBankAuthority(bankAuthority string) (model.Transactions, error) {
+
+	var transaction model.Transactions
+	db, err := db.GetDatabaseConnection()
+
+	if err != nil {
+		return transaction, err
+	}
+	tx := db.Preload("User").Preload("Gateway").First(&transaction, "bank_authority = ?", bankAuthority)
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return transaction, nil
 	}
