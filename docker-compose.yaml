@@ -16,11 +16,29 @@ services:
       - "3306:3306"
     volumes:
       - qpay-mysql-data:/var/lib/mysql
+    networks:
+      - qpay-network
+      - qpay-mysql-phpmyadmin
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-P", "3306", "-uqpay", "-pqpay123456"]
       interval: 30s
       retries: 5
       timeout: 10s
+
+  
+  qpay-phpmyadmin:
+    depends_on:
+      qpay-mysql:
+        condition: service_healthy
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "4000:80"
+    environment:
+      PMA_HOST: qpay-mysql
+      MYSQL_ROOT_PASSWORD: 123456
+    networks:
+      - qpay-mysql-phpmyadmin
 
 
   qpay-app:
@@ -39,8 +57,59 @@ services:
     depends_on:    
       qpay-mysql:
           condition: service_healthy
+    networks:
+      - qpay-network
     links:
       - qpay-mysql
 
+  qpay-shop-mock-app:
+    build: ./ShopMock
+    image: qpay-shop-mock-app
+    container_name: qpay-shop-mock-app
+    hostname: qpay-shop-mock-app
+    # command: >
+    #   /bin/sh -c "
+    #     ./wait-for-it.sh -t 40 mongodb:27017 && npm install && npm start
+    #   "
+    command: yarn start
+    environment:
+      - MONGODB_URL=mongodb://qpay-shop-mock-mongodb:27017/qpay-shop-mock-app
+      - JWT_SECRET=123456
+      - JWT_ACCESS_EXPIRATION_MINUTES=30
+      - JWT_REFRESH_EXPIRATION_DAYS=30
+    ports:
+      - '3000:3000'
+    depends_on:
+      qpay-shop-mock-mongodb:
+        condition: service_healthy
+    # volumes:
+    #   - .:/usr/src/node-app
+    networks:
+      - qpay-shop-mock-network
+      - qpay-network
+
+  qpay-shop-mock-mongodb:
+    image: mongo:4.2.1-bionic
+    ports:
+      - '27017:27017'
+    volumes:
+      - qpay-shop-mock-mongo-data:/data/db
+    networks:
+      - qpay-shop-mock-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
 volumes:
   qpay-mysql-data:
+  qpay-shop-mock-mongo-data:
+
+networks:
+  qpay-shop-mock-network:
+    driver: bridge
+  qpay-network:
+    driver: bridge
+  qpay-mysql-phpmyadmin:
+    driver: bridge

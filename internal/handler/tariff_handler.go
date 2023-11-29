@@ -30,10 +30,32 @@ func NewTariffHandler(tariffRepository repository.TariffRepository) tariffHandle
 func (s *tariffHandler) Create() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		// Parse request body to extract tariff information
-		var newTariff model.Tariffs
-		if err := c.Bind(&newTariff); err != nil {
-			return c.String(http.StatusBadRequest, "Invalid request body")
+		// var newTariff model.Tariffs
+		var request struct {
+			Name         string `json:"name" form:"name" validate:"required"`
+			Description  string `json:"description" form:"description" validate:"required"`
+			Price        int    `json:"price" form:"price" validate:"required"`
+			Currency     string `json:"currency" form:"currency" validate:"required"`
+			ValidityDays int    `json:"validity_days" form:"validity_days" validate:"required"`
+			IsDefault    int    `json:"is_default" form:"is_default" validate:"required"`
 		}
+		if err := c.Bind(&request); err != nil {
+			return c.JSON(http.StatusBadRequest, "Invalid body request")
+		}
+
+		if err := c.Validate(request); err != nil {
+			return c.JSON(http.StatusBadRequest, "Validation error: "+err.Error())
+		}
+
+		newTariff := model.Tariffs{
+			Name:         request.Name,
+			Description:  request.Description,
+			Price:        request.Price,
+			Currency:     request.Currency,
+			ValidityDays: request.ValidityDays,
+			IsDefault:    request.IsDefault,
+		}
+
 		// Create tariff using tariffRepository
 		createdTariff, err := s.repository.Create(newTariff)
 		if err != nil {
@@ -52,16 +74,39 @@ func (s *tariffHandler) Update() echo.HandlerFunc {
 		}
 		tariffIdUint := uint(tariffId)
 
-		// Parse request body to extract tariff information
-		var newTariff model.Tariffs
-		if err := c.Bind(&newTariff); err != nil {
-			return c.String(http.StatusBadRequest, "Invalid request body")
+		var request struct {
+			Name         string `json:"name" form:"name" validate:"required"`
+			Description  string `json:"description" form:"description" validate:"required"`
+			Price        int    `json:"price" form:"price" validate:"required"`
+			Currency     string `json:"currency" form:"currency" validate:"required"`
+			ValidityDays int    `json:"validity_days" form:"validity_days" validate:"required"`
+			IsDefault    int    `json:"is_default" form:"is_default" validate:"required"`
+		}
+		if err := c.Bind(&request); err != nil {
+			return c.JSON(http.StatusBadRequest, "Invalid body request")
+		}
+
+		if err := c.Validate(request); err != nil {
+			return c.JSON(http.StatusBadRequest, "Validation error: "+err.Error())
+		}
+
+		newTariff := model.Tariffs{
+			Name:         request.Name,
+			Description:  request.Description,
+			Price:        request.Price,
+			Currency:     request.Currency,
+			ValidityDays: request.ValidityDays,
+			IsDefault:    request.IsDefault,
 		}
 
 		// Update tariff using tariffRepository
 		updatedTariff, err := s.repository.Update(tariffIdUint, newTariff)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, "Error updating tariff")
+		}
+
+		if updatedTariff.ID == 0 {
+			return c.String(http.StatusNotFound, "Tariff not found")
 		}
 
 		return c.JSON(http.StatusOK, updatedTariff)

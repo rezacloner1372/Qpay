@@ -68,9 +68,12 @@ func routing(e *echo.Echo) {
 	e.GET("/auth/logout", userHandler.Logout(), customeMiddleware.RequireAuth)
 
 	paymentGatewaysRepo := repository.NewPaymentGatewaysRepository()
-	paymentHandler := handler.NewPaymentGatewaysHandler(paymentGatewaysRepo)
-	e.POST("/payment/gateway/new", paymentHandler.CreatePersonalGateway())
-	e.POST("/payment/gateway/business/new", paymentHandler.CreateBusinessGateway())
+	paymentGatewayHandler := handler.NewPaymentGatewaysHandler(paymentGatewaysRepo)
+	e.POST("/payment-gateways/new", paymentGatewayHandler.Create(), customeMiddleware.RequireAuth)
+	e.PUT("/payment-gateways/:id", paymentGatewayHandler.Update(), customeMiddleware.RequireAuth)
+	e.DELETE("/payment-gateways/:id", paymentGatewayHandler.Delete(), customeMiddleware.RequireAuth)
+	e.GET("/payment-gateways/all", paymentGatewayHandler.GetAll(), customeMiddleware.RequireAuth)
+	e.GET("/payment-gateways/:id", paymentGatewayHandler.GetById(), customeMiddleware.RequireAuth)
 
 	tariffRepo := repository.NewTariffRepository()
 	tariffHandler := handler.NewTariffHandler(tariffRepo)
@@ -79,4 +82,18 @@ func routing(e *echo.Echo) {
 	e.DELETE("/tariff/:id", tariffHandler.Delete(), customeMiddleware.RequireAuth)
 	e.GET("/tariff/all", tariffHandler.GetAll(), customeMiddleware.RequireAuth)
 	e.GET("/tariff/:id", tariffHandler.GetById(), customeMiddleware.RequireAuth)
+
+	transactionRepo := repository.NewTransactionRepository()
+	transactionHandler := handler.NewTransactionHandler(transactionRepo)
+	e.POST("/transaction/new", transactionHandler.Create(), customeMiddleware.RequireAuth)
+	e.PUT("/transaction/:id", transactionHandler.Update(), customeMiddleware.RequireAuth)
+	e.DELETE("/transaction/:id", transactionHandler.Delete(), customeMiddleware.RequireAuth)
+	e.GET("/transaction/all", transactionHandler.GetAll(), customeMiddleware.RequireAuth)
+	e.GET("/transaction/:id", transactionHandler.GetById(), customeMiddleware.RequireAuth)
+
+	paymentHandler := handler.NewPaymentHandler(transactionRepo, paymentGatewaysRepo)
+	e.POST("/payment/request", paymentHandler.PaymentRequest())
+	e.POST("/payment/verify", paymentHandler.PaymentVerification())
+	e.GET("/payment/callback", paymentHandler.PaymentCallback())
+	e.GET("/payment/:Authority", paymentHandler.PaymentAction())
 }
