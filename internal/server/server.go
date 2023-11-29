@@ -4,6 +4,7 @@ import (
 	"Qpay/internal/db"
 	"Qpay/internal/handler"
 	"Qpay/internal/repository"
+	"Qpay/pkg/bank"
 	"net/http"
 
 	customeMiddleware "Qpay/internal/middleware"
@@ -39,7 +40,7 @@ func NewServer() *Server {
 	}
 }
 
-func (s *Server) Start(address string, cfg *db.Config) error {
+func (s *Server) Start(address string, dbcfg *db.Config, trcfg *bank.Config) error {
 	e := s.E
 	e.Validator = &CustomValidator{validator: validator.New()}
 
@@ -47,8 +48,8 @@ func (s *Server) Start(address string, cfg *db.Config) error {
 	e.Use(middleware.Logger())  // Logger
 	e.Use(middleware.Recover()) // Recover
 
-	db.CreateDBConnection(cfg)
-	routing(s.E)
+	db.CreateDBConnection(dbcfg)
+	routing(s.E, trcfg)
 
 	go func() {
 		if err := e.Start(address); err != nil {
@@ -59,7 +60,7 @@ func (s *Server) Start(address string, cfg *db.Config) error {
 	return nil
 }
 
-func routing(e *echo.Echo) {
+func routing(e *echo.Echo, cfg *bank.Config) {
 	userRepo := repository.NewUserRepository()
 	userHandler := handler.NewUserHandler(userRepo)
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
@@ -91,7 +92,7 @@ func routing(e *echo.Echo) {
 	e.GET("/transaction/all", transactionHandler.GetAll(), customeMiddleware.RequireAuth)
 	e.GET("/transaction/:id", transactionHandler.GetById(), customeMiddleware.RequireAuth)
 
-	paymentHandler := handler.NewPaymentHandler(transactionRepo, paymentGatewaysRepo)
+	paymentHandler := handler.NewPaymentHandler(*cfg, transactionRepo, paymentGatewaysRepo)
 	e.POST("/payment/request", paymentHandler.PaymentRequest())
 	e.POST("/payment/verify", paymentHandler.PaymentVerification())
 	e.GET("/payment/callback", paymentHandler.PaymentCallback())
