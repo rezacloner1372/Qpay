@@ -15,6 +15,7 @@ type TransactionRepository interface {
 	Delete(id uint) error
 	GetAll() ([]model.Transactions, error)
 	GetById(id uint) (model.Transactions, error)
+	GetByAuthority(authority string) (model.Transactions, error)
 }
 
 type transactionRepository struct {
@@ -75,6 +76,21 @@ func (t *transactionRepository) GetById(id uint) (model.Transactions, error) {
 		return transaction, err
 	}
 	tx := db.First(&transaction, id)
+	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+		return transaction, nil
+	}
+	return transaction, tx.Error
+}
+
+func (t *transactionRepository) GetByAuthority(authority string) (model.Transactions, error) {
+
+	var transaction model.Transactions
+	db, err := db.GetDatabaseConnection()
+
+	if err != nil {
+		return transaction, err
+	}
+	tx := db.First(&transaction, "authority = ?", authority)
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return transaction, nil
 	}

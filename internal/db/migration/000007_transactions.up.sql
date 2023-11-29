@@ -14,5 +14,5 @@ CREATE TABLE IF NOT EXISTS transactions (
     Description VARCHAR(255),
     Email VARCHAR(255),
     Phone VARCHAR(255) NOT NULL,
-    Authority VARCHAR(255) NOT NULL,
+    Authority VARCHAR(255) UNIQUE NOT NULL,
 );

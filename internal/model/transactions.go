@@ -23,5 +23,5 @@ type Transactions struct {
 	Description     string          `gorm:""`
 	Email           string          `gorm:""`
 	Phone           string          `gorm:"not null"`
-	Authority       string          `gorm:"not null"`
+	Authority       string          `gorm:"unique_index;not null"`
 }

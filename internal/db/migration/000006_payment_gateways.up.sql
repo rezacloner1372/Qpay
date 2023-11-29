@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS payment_gateways (
     personalized_url VARCHAR(255) NOT NULL,
     is_default INT NOT NULL DEFAULT 1,
     registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+    merchant_id VARCHAR(255) NOT NULL,
     tariff_id INT,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (tariff_id) REFERENCES tariffs(id)

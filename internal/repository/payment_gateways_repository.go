@@ -3,7 +3,6 @@ package repository
 import (
 	"Qpay/internal/db"
 	"Qpay/internal/model"
-
 )
 
 type PaymentGatewaysRepository interface {
@@ -12,6 +11,7 @@ type PaymentGatewaysRepository interface {
 	Delete(id uint) error
 	GetAll() ([]model.PaymentGateways, error)
 	GetById(id uint) (model.PaymentGateways, error)
+	GetByMerchantId(merchantId string) (model.PaymentGateways, error)
 }
 
 type paymentGatewaysRepository struct {
@@ -78,5 +78,18 @@ func (u *paymentGatewaysRepository) GetById(id uint) (model.PaymentGateways, err
 	}
 
 	tx := db.Find(&paymentGateway, id)
+	return paymentGateway, tx.Error
+}
+
+func (u *paymentGatewaysRepository) GetByMerchantId(merchantId string) (model.PaymentGateways, error) {
+
+	var paymentGateway model.PaymentGateways
+	db, err := db.GetDatabaseConnection()
+
+	if err != nil {
+		return paymentGateway, err
+	}
+
+	tx := db.Find(&paymentGateway, "merchant_id = ?", merchantId)
 	return paymentGateway, tx.Error
 }

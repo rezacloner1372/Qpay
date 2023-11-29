@@ -19,4 +19,5 @@ type PaymentGateways struct {
 	IsDefault       int      `gorm:"not null;default:1"`
 	TariffID        *uint    // Assuming tariffs are pointers (optional field)
 	Tariff          *Tariffs `gorm:"foreignKey:TariffID"`
+	MerchantID      string   `gorm:"not null"`
 }
