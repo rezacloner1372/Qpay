@@ -92,3 +92,66 @@ func TestUserSignup(t *testing.T) {
 	})
 }
 
+func TestUserLogin(t *testing.T) {
+	e := echo.New()
+
+	userRepo := repository.NewUserRepository()
+	userHandler := handler.NewUserHandler(userRepo)
+
+	testUser := model.User{
+		Username: "testuser",
+		Password: "testpassword",
+	}
+	userRepo.Create(testUser)
+
+	t.Run("Valid Login", func(t *testing.T) {
+		requestPayload := `{
+			"username": "testuser",
+			"password": "testpassword"
+		}`
+
+		req := httptest.NewRequest(http.MethodPost, "/auth/login", bytes.NewBufferString(requestPayload))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		err := userHandler.Login()(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, rec.Code)
+	})
+
+	t.Run("Invalid Password", func(t *testing.T) {
+		requestPayload := `{
+			"username": "testuser",
+			"password": "wrongpassword"
+		}`
+
+		req := httptest.NewRequest(http.MethodPost, "/auth/login", bytes.NewBufferString(requestPayload))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		err := userHandler.Login()(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusUnauthorized, rec.Code)
+	})
+
+	t.Run("User Not Found", func(t *testing.T) {
+		requestPayload := `{
+			"username": "nonexistentuser",
+			"password": "somepassword"
+		}`
+
+		req := httptest.NewRequest(http.MethodPost, "/auth/login", bytes.NewBufferString(requestPayload))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		err := userHandler.Login()(c)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusInternalServerError, rec.Code)
+	})
+}
