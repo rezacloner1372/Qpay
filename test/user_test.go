@@ -2,9 +2,11 @@ package test
 
 import (
 	"Qpay/internal/handler"
+	"Qpay/internal/middleware"
 	"Qpay/internal/model"
 	"Qpay/internal/repository"
 	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -153,5 +155,57 @@ func TestUserLogin(t *testing.T) {
 
 		assert.NoError(t, err)
 		assert.Equal(t, http.StatusInternalServerError, rec.Code)
+	})
+}
+
+func TestUserLogout(t *testing.T) {
+	e := echo.New()
+
+	userRepo := repository.NewUserRepository()
+	userHandler := handler.NewUserHandler(userRepo)
+
+	e.Use(middleware.RequireAuth)
+
+	e.GET("/auth/logout", userHandler.Logout())
+
+	t.Run("Valid Logout with Authentication", func(t *testing.T) {
+		loginRequestPayload := `{
+			"username": "testuser",
+			"password": "testpassword"
+		}`
+
+		loginReq := httptest.NewRequest(http.MethodPost, "/auth/login", bytes.NewBufferString(loginRequestPayload))
+		loginReq.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		loginRec := httptest.NewRecorder()
+		loginCtx := e.NewContext(loginReq, loginRec)
+
+		err := userHandler.Login()(loginCtx)
+		assert.NoError(t, err)
+
+		var loginResponse map[string]string
+		assert.NoError(t, json.Unmarshal(loginRec.Body.Bytes(), &loginResponse))
+		authToken := loginResponse["token"]
+
+		logoutReq := httptest.NewRequest(http.MethodGet, "/auth/logout", nil)
+		logoutReq.Header.Set(echo.HeaderAuthorization, "Bearer "+authToken)
+		logoutRec := httptest.NewRecorder()
+		logoutCtx := e.NewContext(logoutReq, logoutRec)
+
+		err = userHandler.Logout()(logoutCtx)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusOK, logoutRec.Code)
+		assert.Equal(t, "Logout", logoutRec.Body.String())
+	})
+
+	t.Run("Unauthorized Logout without Authentication", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/auth/logout", nil)
+		rec := httptest.NewRecorder()
+		c := e.NewContext(req, rec)
+
+		err := userHandler.Logout()(c)
+
+		assert.Error(t, err)
+		assert.Equal(t, http.StatusUnauthorized, rec.Code)
 	})
 }
