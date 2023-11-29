@@ -18,11 +18,27 @@ services:
       - qpay-mysql-data:/var/lib/mysql
     networks:
       - qpay-network
+      - qpay-mysql-phpmyadmin
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-P", "3306", "-uqpay", "-pqpay123456"]
       interval: 30s
       retries: 5
       timeout: 10s
+
+  
+  qpay-phpmyadmin:
+    depends_on:
+      qpay-mysql:
+        condition: service_healthy
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "4000:80"
+    environment:
+      PMA_HOST: qpay-mysql
+      MYSQL_ROOT_PASSWORD: 123456
+    networks:
+      - qpay-mysql-phpmyadmin
 
 
   qpay-app:
@@ -94,4 +110,6 @@ networks:
   qpay-shop-mock-network:
     driver: bridge
   qpay-network:
+    driver: bridge
+  qpay-mysql-phpmyadmin:
     driver: bridge
