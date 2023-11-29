@@ -90,4 +90,10 @@ func routing(e *echo.Echo) {
 	e.DELETE("/transaction/:id", transactionHandler.Delete(), customeMiddleware.RequireAuth)
 	e.GET("/transaction/all", transactionHandler.GetAll(), customeMiddleware.RequireAuth)
 	e.GET("/transaction/:id", transactionHandler.GetById(), customeMiddleware.RequireAuth)
+
+	paymentHandler := handler.NewPaymentHandler(transactionRepo, paymentGatewaysRepo)
+	e.POST("/payment/request", paymentHandler.PaymentRequest())
+	e.POST("/payment/verify", paymentHandler.PaymentVerification())
+	// e.GET("/payment/callback", paymentHandler.PaymentCallback())
+	e.GET("/payment/:Authority", paymentHandler.PaymentAction())
 }
