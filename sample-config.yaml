@@ -10,3 +10,6 @@ jwt:
 server:
   host: "qpay-app"
   port: 8080
+bank:
+  merchantId: "8a45f66a-f3cd-403b-9deb-31df917e0200"
+  baseurl: "https://potential-waffle-5xqpwq556x7345rx-8080.app.github.dev/payment/callback"

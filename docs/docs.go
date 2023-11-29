@@ -174,9 +174,9 @@ var doc = `{
                 }
             }
         },
-        "/payment/gateway/new": {
+        "/payment-gateway/new": {
             "post": {
-                "description": "Used By users to create new personal payment gateway.",
+                "description": "Used By users to create new payment gateway.",
                 "consumes": [
                     "application/json"
                 ],
@@ -186,11 +186,30 @@ var doc = `{
                 "tags": [
                     "Payment Gateway"
                 ],
-                "summary": "Create Personal Payment Gateway",
+                "summary": "Create Payment Gateway",
                 "operationId": "personal-payment-gateway",
                 "parameters": [
                     {
-
+                        {
+                            "name": "title",
+                            "in": "body",
+                            "required": true
+                        },
+                        {
+                            "name": "user-id",
+                            "in": "body",
+                            "required": true
+                        },
+                        {
+                            "name": "isdefault",
+                            "in": "body",
+                            "required": true
+                        },
+                        {
+                            "name": "tariffid",
+                            "in": "body",
+                            "required": true
+                        }
                     }
                 ],
                 "responses": {
@@ -206,14 +225,14 @@ var doc = `{
                 }
             }
         },
-        "/payment/gateway/business/new": {
-            "post": {
+        "/payment-gateway/:id": {
+            "get": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Used By Companies to create new business payment gateway.",
+                "description": "Used to Get Payment Gateways Details",
                 "consumes": [
                     "application/json"
                 ],
@@ -223,10 +242,14 @@ var doc = `{
                 "tags": [
                     "Payment Gateway"
                 ],
-                "summary": "Create Business Payment Gateway",
-                "operationId": "business-payment-gateway",
+                "summary": "Get Payment Gateway",
+                "operationId": "payment-gateway",
                 "parameters": [
-
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
                 ],
                 "responses": {
                     "200": {
@@ -237,6 +260,111 @@ var doc = `{
                     },
                     "401": {
                         "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Used to Delete Payment Gateways",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payment Gateway"
+                ],
+                "summary": "Delete Payment Gateway",
+                "operationId": "payment-gateway",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+            "delete": {
+                    "security": [
+                {
+                    "ApiKeyAuth": []
+                }
+                ],
+                "description": "Used to Update Payment Gateways",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payment Gateway"
+                ],
+                "summary": "Update Payment Gateway",
+                "operationId": "payment-gateway",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }    
+            }
+        },
+        "/payment-gateways/all": {
+            "get": {
+                "description": "Used to get All Payment Gateways",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Get All Gateways",
+                "operationId": "Payment Gateway",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     },
                     "500": {
                         "description": "Internal Server Error"
@@ -487,6 +615,369 @@ var doc = `{
                 ],
                 "summary": "Get All Tariffs",
                 "operationId": "get-all-tariffs",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/transaction/new": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Define New Transaction for User.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaction"
+                ],
+                "summary": "Create Transaction",
+                "operationId": "create-transaction",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "title",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "user-id",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "isdefault",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "tarrif-id",
+                        "in": "body",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/transaction/:id": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get an specific transaction using its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaction"
+                ],
+                "summary": "Get Transaction",
+                "operationId": "get-transaction",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "update prefered transaction values",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaction"
+                ],
+                "summary": "Update Transaction",
+                "operationId": "update-tariff",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "name": "title",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "user-id",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "isdefault",
+                        "in": "body",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "name": "tarrif-id",
+                        "in": "body",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "delete prefered transaction",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaction"
+                ],
+                "summary": "Delete Transaction",
+                "operationId": "delete-tariff",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+            }
+        },
+        "/transaction/all": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get list of all transcations",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Transaction"
+                ],
+                "summary": "Get All Transaction",
+                "operationId": "get-all-tariffs",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/payment/request": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "request a payment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "Request Payment",
+                "operationId": "Payment",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/payment/verify": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "verify payment",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "Verify",
+                "operationId": "Payment",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/payment/callback": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "payment callback",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "callback",
+                "operationId": "Payment",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/payment/:Authority": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "get list of all transcations",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Payment"
+                ],
+                "summary": "Get All Transaction",
+                "operationId": "Payment",
                 "responses": {
                     "200": {
                         "description": "OK"

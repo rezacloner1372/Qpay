@@ -3,6 +3,7 @@ package handler
 import (
 	"Qpay/internal/model"
 	"Qpay/internal/repository"
+	"Qpay/pkg/bank"
 	"net/http"
 	"time"
 
@@ -20,12 +21,14 @@ type PaymentHandler interface {
 }
 
 type paymentHandler struct {
+	config                    bank.Config
 	transactionRepository     repository.TransactionRepository
 	paymentGatewaysRepository repository.PaymentGatewaysRepository
 }
 
-func NewPaymentHandler(transactionRepository repository.TransactionRepository, paymentGatewaysRepository repository.PaymentGatewaysRepository) paymentHandler {
+func NewPaymentHandler(cfg bank.Config, transactionRepository repository.TransactionRepository, paymentGatewaysRepository repository.PaymentGatewaysRepository) paymentHandler {
 	return paymentHandler{
+		config:                    cfg,
 		transactionRepository:     transactionRepository,
 		paymentGatewaysRepository: paymentGatewaysRepository,
 	}
@@ -163,7 +166,7 @@ func (s *paymentHandler) PaymentCallback() echo.HandlerFunc {
 		}
 
 		if status == "OK" {
-			zarinPay, err := zarinpal.NewZarinpal("8a45f66a-f3cd-403b-9deb-31df917e0200", false)
+			zarinPay, err := zarinpal.NewZarinpal(s.config.MerchantID, false)
 			if err != nil {
 				// return c.String(http.StatusInternalServerError, err.Error())
 				return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"?authority="+transaction.Authority)
@@ -229,11 +232,11 @@ func (s *paymentHandler) PaymentAction() echo.HandlerFunc {
 			return c.String(http.StatusNotFound, "Transaction not found")
 		}
 
-		zarinPay, err := zarinpal.NewZarinpal("8a45f66a-f3cd-403b-9deb-31df917e0200", false)
+		zarinPay, err := zarinpal.NewZarinpal(s.config.MerchantID, false)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
-		paymentURL, authority, statusCode, err := zarinPay.NewPaymentRequest(transaction.Amount, "https://potential-waffle-5xqpwq556x7345rx-8080.app.github.dev/payment/callback", transaction.Description, transaction.Email, transaction.Phone)
+		paymentURL, authority, statusCode, err := zarinPay.NewPaymentRequest(transaction.Amount, s.config.BaseURL, transaction.Description, transaction.Email, transaction.Phone)
 
 		if err != nil {
 			return c.String(http.StatusInternalServerError, err.Error())
