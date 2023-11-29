@@ -1,5 +1,5 @@
 database:
-  mysql_host: "localhost"
+  mysql_host: "qpay-mysql"
   mysql_port: 3306
   mysql_username: "root"
   mysql_password: "123456"
