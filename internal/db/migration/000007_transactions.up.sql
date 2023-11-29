@@ -10,4 +10,9 @@ CREATE TABLE IF NOT EXISTS transactions (
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (gateway_id) REFERENCES payment_gateways(id)
+    CallbackURL VARCHAR(255) NOT NULL,
+    Description VARCHAR(255),
+    Email VARCHAR(255),
+    Phone VARCHAR(255) NOT NULL,
+    Authority VARCHAR(255) NOT NULL,
 );

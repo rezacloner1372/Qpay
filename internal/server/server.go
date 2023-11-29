@@ -82,4 +82,12 @@ func routing(e *echo.Echo) {
 	e.DELETE("/tariff/:id", tariffHandler.Delete(), customeMiddleware.RequireAuth)
 	e.GET("/tariff/all", tariffHandler.GetAll(), customeMiddleware.RequireAuth)
 	e.GET("/tariff/:id", tariffHandler.GetById(), customeMiddleware.RequireAuth)
+
+	transactionRepo := repository.NewTransactionRepository()
+	transactionHandler := handler.NewTransactionHandler(transactionRepo)
+	e.POST("/transaction/new", transactionHandler.Create(), customeMiddleware.RequireAuth)
+	e.PUT("/transaction/:id", transactionHandler.Update(), customeMiddleware.RequireAuth)
+	e.DELETE("/transaction/:id", transactionHandler.Delete(), customeMiddleware.RequireAuth)
+	e.GET("/transaction/all", transactionHandler.GetAll(), customeMiddleware.RequireAuth)
+	e.GET("/transaction/:id", transactionHandler.GetById(), customeMiddleware.RequireAuth)
 }
