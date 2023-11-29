@@ -3,11 +3,12 @@ package repository
 import (
 	"Qpay/internal/db"
 	"Qpay/internal/model"
+
 )
 
 type PaymentGatewaysRepository interface {
 	Create(paymentGateway model.PaymentGateways) (model.PaymentGateways, error)
-	Update(paymentGateway model.PaymentGateways) (model.PaymentGateways, error)
+	Update(id uint, paymentGateway model.PaymentGateways) (model.PaymentGateways, error)
 	Delete(id uint) error
 	GetAll() ([]model.PaymentGateways, error)
 	GetById(id uint) (model.PaymentGateways, error)

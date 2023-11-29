@@ -7,10 +7,11 @@ import (
 )
 
 type Tariffs struct {
+	gorm.Model
 	ID           uint      `gorm:"primaryKey"`
 	CreatedAt    time.Time `gorm:"default:CURRENT_TIMESTAMP"`
 	UpdatedAt    time.Time
-	DeletedAt    gorm.DeletedAt `gorm:"index"`
+	// DeletedAt    gorm.DeletedAt `gorm:"index"`
 	Name         string         `gorm:"not null"`
 	Description  string         `gorm:"not null"`
 	Price        int            `gorm:"not null"`
