@@ -245,13 +245,9 @@ func (s *paymentHandler) PaymentAction() echo.HandlerFunc {
 		if statusCode == 100 {
 			// redirect user to zarinpal
 			transaction.BankAuthority = authority
-			updatedTransaction, err := s.transactionRepository.Update(transaction.ID, transaction)
+			_, err := s.transactionRepository.Update(transaction.ID, transaction)
 			if err != nil {
 				return c.String(http.StatusInternalServerError, err.Error())
-			}
-
-			if updatedTransaction.ID == 0 {
-				return c.String(http.StatusInternalServerError, "transaction not updated")
 			}
 			return c.Redirect(http.StatusFound, paymentURL)
 		}
