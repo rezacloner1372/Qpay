@@ -35,7 +35,7 @@ func (s *userHandler) Signup() echo.HandlerFunc {
 			Name      string `json:"name" form:"name" validate:"required"`
 			Family    string `json:"family" form:"family" validate:"required"`
 			Email     string `json:"email" form:"email" validate:"required,email"`
-			Cellphone string `json:"cellphone" form:"cellphone" validate:"required"`
+			Cellphone string `json:"cellphone" form:"cellphone" validate:"required,min=11,max=11,numeric"`
 			Username  string `json:"username" form:"username" validate:"required"`
 			Password  string `json:"password" form:"password" validate:"required,min=6"`
 		}

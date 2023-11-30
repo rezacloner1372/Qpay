@@ -3,6 +3,7 @@ package repository
 import (
 	"Qpay/internal/db"
 	"Qpay/internal/model"
+	"errors"
 )
 
 type PaymentGatewaysRepository interface {
@@ -33,15 +34,28 @@ func (u *paymentGatewaysRepository) Create(paymentGateway model.PaymentGateways)
 
 }
 
-func (u *paymentGatewaysRepository) Update(id uint, paymentGateway model.PaymentGateways) (model.PaymentGateways, error) {
+func (u *paymentGatewaysRepository) Update(id uint, updatedGateway model.PaymentGateways) (model.PaymentGateways, error) {
 	db, err := db.GetDatabaseConnection()
 
 	if err != nil {
-		return paymentGateway, err
+		return model.PaymentGateways{}, err
 	}
 
-	tx := db.Model(&paymentGateway).Where("id = ?", id).Updates(paymentGateway)
-	return paymentGateway, tx.Error
+	var existingGateway model.PaymentGateways
+	if err := db.Where("id = ?", id).First(&existingGateway).Error; err != nil {
+		return model.PaymentGateways{}, err
+	}
+
+	if existingGateway.ID == 0 {
+		return model.PaymentGateways{}, errors.New("payment gateway not found")
+	}
+
+	// Update only the specified fields in updatedGateway
+	if err := db.Model(&existingGateway).Updates(updatedGateway).Error; err != nil {
+		return model.PaymentGateways{}, err
+	}
+
+	return existingGateway, nil
 }
 
 func (u *paymentGatewaysRepository) Delete(id uint) error {
