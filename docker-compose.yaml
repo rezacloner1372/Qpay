@@ -71,12 +71,13 @@ services:
     #   /bin/sh -c "
     #     ./wait-for-it.sh -t 40 mongodb:27017 && npm install && npm start
     #   "
-    command: yarn start
+    command: npm start
     environment:
-      - MONGODB_URL=mongodb://qpay-shop-mock-mongodb:27017/qpay-shop-mock-app
-      - JWT_SECRET=123456
-      - JWT_ACCESS_EXPIRATION_MINUTES=30
-      - JWT_REFRESH_EXPIRATION_DAYS=30
+      - MONGODB_URI=mongodb://qpay-shop-mock-mongodb:27017/qpay-shop-mock-app?authSource=admin
+      - QPAY_MERCHANT_ID=54034484-c8fb-445c-a6fb-f4415399bfe7
+      - QPAY_API_URL=https://potential-waffle-5xqpwq556x7345rx-8080.app.github.dev
+      - QPAY_SHOP_MOCK_APP_EXTERNAL_URL=https://potential-waffle-5xqpwq556x7345rx-3000.app.github.dev
+      - QPAY_SHOP_MOCK_APP_INTERNAL_URL=http://qpay-shop-mock-app:3000
     ports:
       - '3000:3000'
     depends_on:

@@ -156,20 +156,20 @@ func (s *paymentHandler) PaymentCallback() echo.HandlerFunc {
 
 		if err != nil {
 			// return c.String(http.StatusInternalServerError, err.Error())
-			return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"?authority="+transaction.Authority)
+			return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"&authority="+transaction.Authority)
 		}
 
 		// if transaction not exists
 		if transaction.ID == 0 {
 			// return c.String(http.StatusNotFound, "Transaction not found")
-			return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"?authority="+transaction.Authority)
+			return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"&authority="+transaction.Authority)
 		}
 
 		if status == "OK" {
 			zarinPay, err := zarinpal.NewZarinpal(s.config.MerchantID, false)
 			if err != nil {
 				// return c.String(http.StatusInternalServerError, err.Error())
-				return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"?authority="+transaction.Authority)
+				return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"&authority="+transaction.Authority)
 			}
 			authority := transaction.BankAuthority // The authority of the payment
 			amount := transaction.Amount           // The amount of payment in Tomans
@@ -177,7 +177,7 @@ func (s *paymentHandler) PaymentCallback() echo.HandlerFunc {
 
 			if err != nil {
 				// return c.String(http.StatusInternalServerError, "خطایی رخ داد: "+err.Error())
-				return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"?authority="+transaction.Authority)
+				return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"&authority="+transaction.Authority)
 			}
 
 			if (statusCode == 101) || (statusCode == 100) {
@@ -187,15 +187,15 @@ func (s *paymentHandler) PaymentCallback() echo.HandlerFunc {
 				updatedTransaction, err := s.transactionRepository.Update(transaction.ID, transaction)
 				if err != nil {
 					// return c.String(http.StatusInternalServerError, "transaction not updated")
-					return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"?authority="+transaction.Authority)
+					return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"&authority="+transaction.Authority)
 				}
 
 				if updatedTransaction.ID == 0 {
 					// return c.String(http.StatusInternalServerError, "transaction not updated")
-					return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"?authority="+transaction.Authority)
+					return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"&authority="+transaction.Authority)
 				}
 
-				return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=successful"+"?authority="+transaction.Authority)
+				return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=successful"+"&authority="+transaction.Authority)
 			}
 
 		}
@@ -205,15 +205,15 @@ func (s *paymentHandler) PaymentCallback() echo.HandlerFunc {
 		updatedTransaction, err := s.transactionRepository.Update(transaction.ID, transaction)
 		if err != nil {
 			// return c.String(http.StatusInternalServerError, err.Error())
-			return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"?authority="+transaction.Authority)
+			return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"&authority="+transaction.Authority)
 		}
 
 		if updatedTransaction.ID == 0 {
 			// return c.String(http.StatusInternalServerError, "transaction not updated")
-			return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"?authority="+transaction.Authority)
+			return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"&authority="+transaction.Authority)
 		}
 
-		return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"?authority="+transaction.Authority)
+		return c.Redirect(http.StatusFound, transaction.CallbackURL+"?status=unsuccessful"+"&authority="+transaction.Authority)
 	}
 }
 
