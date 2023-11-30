@@ -33,14 +33,28 @@ func (t *tariffRepository) Create(tariff model.Tariffs) (model.Tariffs, error) {
 	return tariff, tx.Error
 }
 
-func (t *tariffRepository) Update(id uint, tariff model.Tariffs) (model.Tariffs, error) {
+func (t *tariffRepository) Update(id uint, updatedTariff model.Tariffs) (model.Tariffs, error) {
 	db, err := db.GetDatabaseConnection()
 
 	if err != nil {
-		return tariff, err
+		return model.Tariffs{}, err
 	}
-	tx := db.Model(&tariff).Where("id = ?", id).Updates(tariff)
-	return tariff, tx.Error
+
+	var existingTariff model.Tariffs
+	if err := db.Where("id = ?", id).First(&existingTariff).Error; err != nil {
+		return model.Tariffs{}, err
+	}
+
+	if existingTariff.ID == 0 {
+		return model.Tariffs{}, errors.New("tariff not found")
+	}
+
+	// Update only the fields that are provided in updatedTariff
+	if err := db.Model(&existingTariff).Updates(updatedTariff).Error; err != nil {
+		return model.Tariffs{}, err
+	}
+
+	return existingTariff, nil
 }
 
 func (t *tariffRepository) Delete(id uint) error {

@@ -105,10 +105,6 @@ func (s *tariffHandler) Update() echo.HandlerFunc {
 			return c.String(http.StatusInternalServerError, "Error updating tariff")
 		}
 
-		if updatedTariff.ID == 0 {
-			return c.String(http.StatusNotFound, "Tariff not found")
-		}
-
 		return c.JSON(http.StatusOK, updatedTariff)
 	}
 }
