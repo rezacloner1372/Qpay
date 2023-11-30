@@ -5,40 +5,84 @@ import (
 	"Qpay/internal/middleware"
 	"Qpay/internal/model"
 	"Qpay/internal/repository"
+	"Qpay/internal/db"
+	"Qpay/internal/config"
+
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"strings"
 	"testing"
 
+	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+func (cv *CustomValidator) Validate(i interface{}) error {
+	if err := cv.validator.Struct(i); err != nil {
+		// Optionally, you could return the error to give each route more control over the status code
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return nil
+}
+
+type User struct {
+	Name      string `json:"name"`
+	Family    string `json:"family"`
+	Email     string `json:"email"`
+	Cellphone string `json:"cellphone"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+}
+
+func structToFormURLEncoded(u User) string {
+	v := url.Values{}
+	v.Set("name", u.Name)
+	v.Set("family", u.Family)
+	v.Set("email", u.Email)
+	v.Set("cellphone", u.Cellphone)
+	v.Set("username", u.Username)
+	v.Set("password", u.Password)
+	return v.Encode()
+}
+
 func TestUserSignup(t *testing.T) {
 	e := echo.New()
+	e.Validator = &CustomValidator{validator: validator.New()}
+
+	cfg, _ := config.Load(false)
+	db.CreateDBConnection(cfg.DB)
 
 	userRepo := repository.NewUserRepository()
 	userHandler := handler.NewUserHandler(userRepo)
 
 	t.Run("Valid Request", func(t *testing.T) {
-		requestPayload := `{
-			"name": "John",
-			"family": "Doe",
-			"email": "john.doe@example.com",
-			"cellphone": "123456789",
-			"username": "johndoe",
-			"password": "password123"
-		}`
+		requestPayload := User{
+			Name:      "John",
+			Family:    "Doe",
+			Email:     "john.doe@example.com",
+			Cellphone: "123456789",
+			Username:  "johndoe",
+			Password:  "password123",
+		}
 
-		req := httptest.NewRequest(http.MethodPost, "/auth/signup", bytes.NewBufferString(requestPayload))
-		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+		req := httptest.NewRequest(http.MethodPost, "/auth/signup", strings.NewReader(structToFormURLEncoded(requestPayload)))
+		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationForm)
 		rec := httptest.NewRecorder()
 		c := e.NewContext(req, rec)
 
 		err := userHandler.Signup()(c)
 
 		assert.NoError(t, err)
+		fmt.Println(rec.Body.String())
 		assert.Equal(t, http.StatusOK, rec.Code)
 	})
 

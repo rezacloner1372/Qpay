@@ -73,7 +73,7 @@ func (s *userHandler) Signup() echo.HandlerFunc {
 					return c.String(http.StatusBadRequest, "Cellphone already exists")
 				}
 			}
-			return c.String(http.StatusInternalServerError, "Error creating user")
+			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
 		return c.JSON(http.StatusOK, result)
