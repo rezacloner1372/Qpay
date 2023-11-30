@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="shortcut icon" type="image/jpg" href="assets/img/favicon/favicon.png?v=v1.0.3" />
+    <link type="text/css" rel="stylesheet" href="assets/css/main.css?v=v1.0.7" />
+    <link type="text/css" rel="stylesheet" href="assets/css/lib/iziToast.min.css?v=v1.4.0" />
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="row align-items-center justify-content-center" hidden>
+                <section class="text-center title-img">
+                </section>
+            </div>
+        </div>
+    </header>
+    <div class="main">
+        <section id="app">
+            <section id="process" class="work-process-section position-relative">
+                <div class="container">
+                    <div class="row align-items-center justify-content-md-center justify-content-sm-center mt-5 mb-5">
+                        <div class="col-sm-12 col-md-6 col-lg-6">
+                            <div class="campaign-form-container gray-light-bg p-4">
+                                <form autocomplete="off">
+                                    <div class="form-row">
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label for="fullName" style="font-weight: 900;">نام و نام
+                                                    خانوادگی</label>
+                                                <input type="text" name="fullName" class="form-control"
+                                                    placeholder="نام و نام خانوادگی خود را وارد نماييد. (فارسی)"
+                                                    oninvalid="setCustomValidity('نام و نام خانوادگی خود را وارد نماييد. (فارسی)')"
+                                                    onchange="try{setCustomValidity('')}catch(e){}"
+                                                    oninput="setCustomValidity(' ')" required />
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label for="phone" style="font-weight: 900;">شماره همراه</label>
+                                                <input type="tel" minlength="11" maxlength="11"
+                                                    name="phone" class="form-control text-right only-digits"
+                                                    placeholder="شماره تماس خود را وارد نماييد."
+                                                    pattern="[0]{1}[9]{1}[0-9]{9}"
+                                                    oninvalid="setCustomValidity('شماره تماس شما بايستي 11 رقمي باشد و با 09 شروع شود')"
+                                                    onchange="try{setCustomValidity('')}catch(e){}"
+                                                    oninput="setCustomValidity(' ')" required />
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-group">
+                                                <label for="" style="font-weight: 900;">مبلغ</label>
+                                                <input type="text" name="amount" class="form-control text-right number"
+                                                    placeholder="مبلغ مورد نظر خود را به تومان وارد نماييد."
+                                                    oninvalid="setCustomValidity('مبلغ مورد نظر خود را به تومان وارد نماييد.')"
+                                                    onchange="try{setCustomValidity('')}catch(e){}"
+                                                    oninput="setCustomValidity(' ')" required />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12 n-outline">
+                                            <button type="submit" class="btn btn-brand-02 w-100" id="submit-form">
+                                                پرداخت
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <br>
+        </section>
+    </div>
+    <div class="scroll-top scroll-to-target primary-bg text-white" data-target="html">
+        <span class="fas fa-hand-point-up"></span>
+    </div>
+
+    <script src="assets/js/vendors/jquery-3.6.0.min.js?v=v3.6.0"></script>
+    <script src="assets/js/vendors/popper.min.js?v=v1.0.0"></script>
+    <script src="assets/js/vendors/bootstrap.min.js?v=v4.6.0"></script>
+    <script src="assets/js/vendors/iziToast.min.js?v=v1.4.0"></script>
+    <script src="assets/js/vendors/plyr.js?v=v3.6.8.1"></script>
+    <script src="assets/js/main.js?v=v1.0.1"></script>
+</body>
+<script>
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+
+    let paymentStatus = urlParams.get('paymentStatus');
+
+    if (paymentStatus == "OK"){
+        $("form").html(`<div class="alert alert-success" role="alert"> پرداخت با موفقیت انجام شد </div>`)
+    } else if (paymentStatus == "NOK") {
+        $("form").html(`<div class="alert alert-danger" role="alert"> پرداخت با موفقیت انجام نشد </div>`)
+    }
+    const serializeObject = (inputArray) => {
+        return inputArray.reduce((obj, item) => (obj[item.name] = item.value, obj), {});
+    }
+
+    $(document).ready(function () {
+        $("form").submit(function (e) {
+            e.preventDefault();
+            $('#submit-form').text('در حال ارسال اطلاعات ....').attr("disabled", true);
+            let inputObject = {
+                ...serializeObject($(this).serializeArray()),
+            }
+            submitForm(inputObject);
+        });
+    });
+
+    function submitForm(inputForm) {
+        console.log(inputForm);
+        $.ajax({
+            type: "POST",
+            url: `/api/v1/payment/create`,
+            data: inputForm,
+            beforeSend: function () {},
+            success: function (response) {
+                if (response.status == "200") {
+                    iziToast.success({
+                        title: '',
+                        message: response.messageFA,
+                        timeout: 10000,
+                        rtl: true
+                    });
+                    window.location.href = response.redirectUrl;
+                } else if (response.status == "429" || response.status == "400" || response.status ==
+                    "404" || response.status == "500" || response.status == '406') {
+                    iziToast.error({
+                        title: 'خطا',
+                        message: response.messageFA,
+                        timeout: 10000,
+                        rtl: true
+                    });
+                    $(`#submit-form`).text('پرداخت ').attr("disabled", false);
+                }
+            },
+            error: function (xhr, message, data) {
+                $(`#submit-form`).text('پرداخت ').attr("disabled", false);
+
+                iziToast.error({
+                    title: 'خطا',
+                    message: 'عدم برقراری ارتباط با سرور ...',
+                    timeout: 5000,
+                    rtl: true
+                });
+            }
+        });
+    }
+</script>
+<script>
+    $(document).ready(function () {
+        $('.only-digits').each(function () {
+            $(this).on('input', function (e) {
+                return this.value = toEnglishDigits(this.value.replace(
+                    /[^\d\u06F0-\u06F90-9]+$/, ''));
+            });
+        });
+
+        function toEnglishDigits(str) {
+
+            // convert persian digits [۰۱۲۳۴۵۶۷۸۹]
+            var e = '۰'.charCodeAt(0);
+            str = str.replace(/[۰-۹]/g, function (t) {
+                return t.charCodeAt(0) - e;
+            });
+
+            // convert arabic indic digits [٠١٢٣٤٥٦٧٨٩]
+            e = '٠'.charCodeAt(0);
+            str = str.replace(/[٠-٩]/g, function (t) {
+                return t.charCodeAt(0) - e;
+            });
+            return str;
+        }
+
+        $('input.number').on('keydown', function (evt) {
+            var theEvent = evt || window.event;
+
+            if (theEvent.type === 'paste') {
+                key = event.clipboardData.getData('text/plain');
+            } else {
+                var key = theEvent.keyCode || theEvent.which;
+                key = String.fromCharCode(key);
+            }
+            var regex = /[0-9]|\./;
+            if (!regex.test(key) && (theEvent.keyCode !== 8 || theEvent.which !== 8)) {
+                theEvent.returnValue = false;
+                if (theEvent.preventDefault) theEvent.preventDefault();
+            }
+        });
+    });
+</script>
+
+</html>

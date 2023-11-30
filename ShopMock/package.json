@@ -1,0 +1,30 @@
+{
+  "name": "qpay-shop-mock-api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www"
+  },
+  "dependencies": {
+    "axios": "^0.22.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "dotenv": "^10.0.0",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "jalali-moment": "^3.3.11",
+    "mongoose": "^6.2.2",
+    "mongoose-sequence": "^5.3.1",
+    "morgan": "~1.9.1",
+    "node-schedule": "^2.1.0",
+    "qs": "^6.11.2",
+    "uuid": "^8.3.2",
+    "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
