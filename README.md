@@ -4,7 +4,7 @@ Qpay is a payment gateway provider. This service enables the creation of payment
 ## Getting Started
 
 Clone the repository:
-`git clone https://github.com/`
+`git clone git@github.com:rezacloner1372/Qpay.git`
 
 ## Features
 
